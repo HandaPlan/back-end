@@ -5,6 +5,7 @@ import com.org.candoit.domain.member.service.MemberService;
 import com.org.candoit.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +17,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @RequestMapping("/join")
+    @PostMapping("/join")
     public ResponseEntity<ApiResponse<Object>> join(@RequestBody MemberJoinRequest memberJoinRequest){
         memberService.join(memberJoinRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
