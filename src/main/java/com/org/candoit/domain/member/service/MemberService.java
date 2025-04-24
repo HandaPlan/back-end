@@ -2,6 +2,7 @@ package com.org.candoit.domain.member.service;
 
 import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
+import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.member.exception.MemberErrorCode;
@@ -55,6 +56,22 @@ public class MemberService {
             .comment(member.getComment())
             .email(member.getEmail())
             .nickname(member.getNickname())
+            .build();
+    }
+
+    public MyPageResponse updateInfo(Long memberId, MemberUpdateRequest memberUpdateRequest){
+
+        Member updateMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(
+            MemberErrorCode.NOT_FOUND_MEMBER));
+
+        updateMember.updateInfo(memberUpdateRequest.getEmail(), memberUpdateRequest.getNickname(),
+            memberUpdateRequest.getComment(), memberUpdateRequest.getProfile_image());
+
+        return MyPageResponse.builder()
+            .profile_image(memberUpdateRequest.getProfile_image())
+            .comment(memberUpdateRequest.getComment())
+            .email(memberUpdateRequest.getEmail())
+            .nickname(memberUpdateRequest.getNickname())
             .build();
     }
 }

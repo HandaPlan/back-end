@@ -31,4 +31,12 @@ public class Member extends BaseTimeEntity {
     private String comment;
 
     private String profilePath;
+
+    public void updateInfo(String email, String nickname, String comment, String profilePath){
+
+        this.email = email;
+        this.nickname = nickname;
+        this.comment = comment;
+        this.profilePath = profilePath;
+    }
 }
