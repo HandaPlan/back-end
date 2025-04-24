@@ -1,10 +1,12 @@
 package com.org.candoit.domain.member.service;
 
+import com.org.candoit.domain.member.dto.CheckPasswordRequest;
 import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
 import com.org.candoit.domain.member.entity.Member;
+import com.org.candoit.domain.member.entity.MemberStatus;
 import com.org.candoit.domain.member.exception.MemberErrorCode;
 import com.org.candoit.domain.member.repository.MemberRepository;
 import com.org.candoit.global.response.CustomException;
@@ -27,6 +29,7 @@ public class MemberService {
             .comment("안녕하세요.")
             .password(memberJoinRequest.getPassword())
             .nickname(memberJoinRequest.getNickname())
+            .memberStatus(MemberStatus.ACTIVITY)
             .build();
 
         memberRepository.save(saveRequestMember);
@@ -73,5 +76,17 @@ public class MemberService {
             .email(memberUpdateRequest.getEmail())
             .nickname(memberUpdateRequest.getNickname())
             .build();
+    }
+
+    public void withdraw(Long memberId, CheckPasswordRequest checkPasswordRequest){
+
+        Member memberToWithdraw = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
+        if(!checkPasswordRequest.getType().equals("WITHDRAW")){
+            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+        }
+        if(!checkPasswordRequest.getPassword().equals(memberToWithdraw.getPassword())){
+            throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
+        }
+        memberToWithdraw.withdraw();
     }
 }
