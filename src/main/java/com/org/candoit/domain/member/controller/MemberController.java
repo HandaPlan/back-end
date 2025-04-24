@@ -1,5 +1,6 @@
 package com.org.candoit.domain.member.controller;
 
+import com.org.candoit.domain.member.dto.CheckPasswordRequest;
 import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
@@ -8,6 +9,7 @@ import com.org.candoit.domain.member.service.MemberService;
 import com.org.candoit.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,5 +46,11 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MyPageResponse>> updateMemberInfo(@RequestBody MemberUpdateRequest memberUpdateRequest){
         MyPageResponse myPageResponse = memberService.updateInfo(4l, memberUpdateRequest);
         return ResponseEntity.ok(ApiResponse.success(myPageResponse));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Object>> withdraw(@RequestBody CheckPasswordRequest checkPasswordRequest){
+        memberService.withdraw(6l, checkPasswordRequest);
+        return ResponseEntity.ok(ApiResponse.successWithoutData());
     }
 }

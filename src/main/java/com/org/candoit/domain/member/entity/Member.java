@@ -2,6 +2,8 @@ package com.org.candoit.domain.member.entity;
 
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,11 +34,19 @@ public class Member extends BaseTimeEntity {
 
     private String profilePath;
 
+    @Enumerated(EnumType.STRING)
+    private MemberStatus memberStatus;
+
     public void updateInfo(String email, String nickname, String comment, String profilePath){
 
         this.email = email;
         this.nickname = nickname;
         this.comment = comment;
         this.profilePath = profilePath;
+    }
+
+    public void withdraw(){
+
+        this.memberStatus = MemberStatus.WITHDRAW;
     }
 }
