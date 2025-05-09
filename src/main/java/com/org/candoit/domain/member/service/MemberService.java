@@ -6,6 +6,7 @@ import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
 import com.org.candoit.domain.member.entity.Member;
+import com.org.candoit.domain.member.entity.MemberRole;
 import com.org.candoit.domain.member.entity.MemberStatus;
 import com.org.candoit.domain.member.exception.MemberErrorCode;
 import com.org.candoit.domain.member.repository.MemberRepository;
@@ -30,6 +31,7 @@ public class MemberService {
             .password(memberJoinRequest.getPassword())
             .nickname(memberJoinRequest.getNickname())
             .memberStatus(MemberStatus.ACTIVITY)
+            .memberRole(MemberRole.ROLE_USER)
             .build();
 
         memberRepository.save(saveRequestMember);

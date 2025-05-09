@@ -37,6 +37,9 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
 
+    @Enumerated(EnumType.STRING)
+    private MemberRole memberRole;
+
     public void updateInfo(String email, String nickname, String comment, String profilePath){
 
         this.email = email;
