@@ -13,6 +13,7 @@ import com.org.candoit.domain.member.repository.MemberRepository;
 import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.response.GlobalErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void join(MemberJoinRequest memberJoinRequest){
 
         Member saveRequestMember = Member.builder()
             .email(memberJoinRequest.getEmail())
             .comment("안녕하세요.")
-            .password(memberJoinRequest.getPassword())
+            .password(bCryptPasswordEncoder.encode(memberJoinRequest.getPassword()))
             .nickname(memberJoinRequest.getNickname())
             .memberStatus(MemberStatus.ACTIVITY)
             .memberRole(MemberRole.ROLE_USER)
