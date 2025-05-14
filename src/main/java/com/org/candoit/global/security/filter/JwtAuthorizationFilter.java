@@ -51,7 +51,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 request.setAttribute(EXCEPTION_ATTRIBUTE, "ACCESS_TOKEN_NOT_EXIST");
             }
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-
             request.setAttribute(EXCEPTION_ATTRIBUTE, "INVALID_TOKEN");
             throw new CustomException(TokenErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
@@ -74,9 +73,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private boolean isExcludedPath(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        boolean isExcluded = excludeAllPaths.stream()
+        return excludeAllPaths.stream()
             .anyMatch(pattern -> antPathMatcher.match(pattern, path));
-
-        return isExcluded;
     }
 }

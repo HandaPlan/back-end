@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AuthErrorCode implements ErrorCode {
 
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"14000", "다시 로그인 해주세요.");
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"14000", "로그인된 사용자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

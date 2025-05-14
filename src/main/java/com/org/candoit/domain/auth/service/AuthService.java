@@ -5,6 +5,7 @@ import com.org.candoit.domain.auth.dto.LoginResponse;
 import com.org.candoit.global.security.jwt.JwtUtil;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthService {
@@ -22,7 +24,7 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest loginRequest) {
 
-        Authentication authentication = null;
+        Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getId(),

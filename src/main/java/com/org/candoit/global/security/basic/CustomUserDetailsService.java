@@ -18,10 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String userInfo) throws UsernameNotFoundException {
 
-        Member findMember = memberRepository.findByEmail(username).orElseThrow(()->new CustomException(
-            MemberErrorCode.NOT_FOUND_MEMBER));
+        Member findMember = (userInfo.contains("@"))?memberRepository.findByEmail(userInfo)
+            .orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER)):
+        memberRepository.findById(Long.parseLong(userInfo))
+            .orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
 
         if(findMember.getMemberStatus() == MemberStatus.WITHDRAW){
             throw new DisabledException(MemberErrorCode.WITHDRAWN_MEMBER.getMessage());

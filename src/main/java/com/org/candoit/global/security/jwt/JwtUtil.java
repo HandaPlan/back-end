@@ -8,11 +8,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -57,6 +55,7 @@ public class JwtUtil {
             .claim("auth", nowMember.getMember().getMemberRole().name())
             .issuedAt(Date.from(nowTime))
             .expiration(Date.from(nowTime.plus(accessTokenExpiration, ChronoUnit.MILLIS)))
+            .signWith(key)
             .compact();
     }
 
@@ -69,6 +68,7 @@ public class JwtUtil {
             .subject(nowMember.getMember().getMemberId().toString())
             .issuedAt(Date.from(nowTime))
             .expiration(Date.from(nowTime.plus(refreshTokenExpiration, ChronoUnit.MILLIS)))
+            .signWith(key)
             .compact();
     }
 
@@ -92,25 +92,6 @@ public class JwtUtil {
         Boolean isInPendingBlackList = redisTemplate.hasKey(("pending-blacklist:access-token:" + accessToken));
 
         return Boolean.TRUE.equals(isInBlackList)&& Boolean.FALSE.equals(isInPendingBlackList);
-    }
-
-    public void addBlackListExistingAccessToken(String accessToken, Date expirationDate) {
-
-        redisTemplate.opsForValue()
-            .set("pending-blacklist:access-token:"+accessToken, "pending",5, TimeUnit.MINUTES);
-
-        redisTemplate.opsForValue()
-            .set("blacklist:access-token:" + accessToken, expirationDate.toString(),
-                Duration.between(new Date().toInstant(), expirationDate.toInstant()).getSeconds(),
-                TimeUnit.SECONDS);
-    }
-
-    public void validateAccessTokenExpiration(Claims accessTokenClaims, String accessToken) {
-        Date accessTokenExpirationDate = accessTokenClaims.getExpiration();
-
-        if(accessTokenExpirationDate.after(new Date())) {
-            addBlackListExistingAccessToken(accessToken, accessTokenExpirationDate);
-        }
     }
 
     public Authentication getAuthentication(String token) {
