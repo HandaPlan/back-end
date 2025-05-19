@@ -48,6 +48,10 @@ public class Member extends BaseTimeEntity {
         this.profilePath = profilePath;
     }
 
+    public void updatePassword(String password){
+        this.password = password;
+    }
+
     public void withdraw(){
 
         this.memberStatus = MemberStatus.WITHDRAW;

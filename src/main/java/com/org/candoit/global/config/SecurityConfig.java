@@ -1,6 +1,5 @@
 package com.org.candoit.global.config;
 
-import com.org.candoit.domain.member.entity.MemberRole;
 import com.org.candoit.global.security.CustomAuthenticationProvider;
 import com.org.candoit.global.security.basic.CustomUserDetailsService;
 import com.org.candoit.global.security.exception.CustomAuthenticationEntryPoint;
