@@ -5,6 +5,7 @@ import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
+import com.org.candoit.domain.member.dto.NewPasswordRequest;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.member.entity.MemberRole;
 import com.org.candoit.domain.member.entity.MemberStatus;
@@ -12,7 +13,9 @@ import com.org.candoit.domain.member.exception.MemberErrorCode;
 import com.org.candoit.domain.member.repository.MemberRepository;
 import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.response.GlobalErrorCode;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public void join(MemberJoinRequest memberJoinRequest){
 
@@ -66,6 +70,32 @@ public class MemberService {
             .build();
     }
 
+    public void updatePassword(Long memberId, NewPasswordRequest newPasswordRequest){
+        checkVerify(memberId, "new-password");
+        Member loginMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
+        loginMember.updatePassword(bCryptPasswordEncoder.encode(newPasswordRequest.getNewPassword()));
+    }
+
+    public void checkPassword(Member loginMember, CheckPasswordRequest checkPasswordRequest){
+        String prefix = "check-password:"+checkPasswordRequest.getType()+":";
+        if(bCryptPasswordEncoder.matches(checkPasswordRequest.getPassword(), loginMember.getPassword())){
+            redisTemplate.opsForValue().set(prefix + loginMember.getMemberId(),
+               "checked",
+                Duration.ofMinutes(5));
+        }else{
+            throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
+        }
+    }
+
+    private void checkVerify(Long memberId, String type){
+        String key = "check-password:"+type+":"+memberId;
+        if(redisTemplate.hasKey(key)){
+            redisTemplate.delete(key);
+        }else{
+            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+        }
+    }
+
     public MyPageResponse updateInfo(Long memberId, MemberUpdateRequest memberUpdateRequest){
 
         Member updateMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(
@@ -85,12 +115,9 @@ public class MemberService {
     public void withdraw(Long memberId, CheckPasswordRequest checkPasswordRequest){
 
         Member memberToWithdraw = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
-        if(!checkPasswordRequest.getType().equals("WITHDRAW")){
-            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
-        }
-        if(!checkPasswordRequest.getPassword().equals(memberToWithdraw.getPassword())){
-            throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
-        }
+
+        checkVerify(memberId, "withdraw");
+
         memberToWithdraw.withdraw();
     }
 }

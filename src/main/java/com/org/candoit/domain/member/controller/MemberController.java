@@ -5,8 +5,12 @@ import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
+import com.org.candoit.domain.member.dto.NewPasswordRequest;
+import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.member.service.MemberService;
+import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,6 +55,18 @@ public class MemberController {
     @DeleteMapping
     public ResponseEntity<ApiResponse<Object>> withdraw(@RequestBody CheckPasswordRequest checkPasswordRequest){
         memberService.withdraw(6l, checkPasswordRequest);
+        return ResponseEntity.ok(ApiResponse.successWithoutData());
+    }
+
+    @PostMapping("password-check")
+    public ResponseEntity<ApiResponse<Object>> checkCorrectPassword(@Parameter(hidden = true) @LoginMember Member loginMember,@RequestBody CheckPasswordRequest checkPasswordRequest){
+        memberService.checkPassword(loginMember, checkPasswordRequest);
+        return ResponseEntity.ok(ApiResponse.successWithoutData());
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<ApiResponse<Object>> updatePassword(@Parameter(hidden = true) @LoginMember Member loginMember, @RequestBody NewPasswordRequest newPasswordRequest){
+        memberService.updatePassword(loginMember.getMemberId(), newPasswordRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
     }
 }
