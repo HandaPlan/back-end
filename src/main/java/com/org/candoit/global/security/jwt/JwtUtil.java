@@ -4,13 +4,17 @@ import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.security.basic.CustomUserDetails;
 import com.org.candoit.global.security.basic.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -63,13 +67,16 @@ public class JwtUtil {
         CustomUserDetails nowMember = (CustomUserDetails) authentication.getPrincipal();
 
         Instant nowTime = Instant.now();
-
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
             .subject(nowMember.getMember().getMemberId().toString())
             .issuedAt(Date.from(nowTime))
             .expiration(Date.from(nowTime.plus(refreshTokenExpiration, ChronoUnit.MILLIS)))
             .signWith(key)
             .compact();
+
+        refreshTokenRepository.save(nowMember.getMember().getMemberId(), refreshToken);
+
+        return refreshToken;
     }
 
     public Claims parseToken(String token) {
@@ -80,6 +87,20 @@ public class JwtUtil {
             .getPayload();
     }
 
+    public Claims extractClaimsOrThrow(String type, String token) {
+
+        try {
+            return parseToken(token);
+        } catch (ExpiredJwtException e) {
+            if (type.equals("accessToken")) {
+                return e.getClaims();
+            }
+            throw new CustomException(TokenErrorCode.EXPIRED_REFRESH_TOKEN);
+        } catch (JwtException e) {
+            throw new CustomException(TokenErrorCode.INVALID_TOKEN);
+        }
+    }
+
     public String removePrefixFromAccessToken(String bearerToken) {
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
             throw new CustomException(TokenErrorCode.ACCESS_TOKEN_NOT_EXIST);
@@ -88,10 +109,15 @@ public class JwtUtil {
     }
 
     public boolean checkBlacklist(String accessToken) {
-        Boolean isInBlackList = redisTemplate.hasKey("blacklist:access-token:" + accessToken);
-        Boolean isInPendingBlackList = redisTemplate.hasKey(("pending-blacklist:access-token:" + accessToken));
+        return redisTemplate.hasKey("blacklist:access-token:" + accessToken);
+    }
 
-        return Boolean.TRUE.equals(isInBlackList)&& Boolean.FALSE.equals(isInPendingBlackList);
+    public void addBlackListExistingAccessToken(String accessToken, Date expirationDate) {
+
+        redisTemplate.opsForValue()
+            .set("blacklist:access-token:" + accessToken, expirationDate.toString(),
+                Duration.between(new Date().toInstant(), expirationDate.toInstant()).getSeconds(),
+                TimeUnit.SECONDS);
     }
 
     public Authentication getAuthentication(String token) {

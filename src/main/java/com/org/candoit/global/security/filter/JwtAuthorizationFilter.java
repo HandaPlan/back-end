@@ -49,6 +49,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         } catch (CustomException e) {
             if (e.getErrorCode() == TokenErrorCode.ACCESS_TOKEN_NOT_EXIST) {
                 request.setAttribute(EXCEPTION_ATTRIBUTE, "ACCESS_TOKEN_NOT_EXIST");
+                throw new CustomException(TokenErrorCode.ACCESS_TOKEN_NOT_EXIST);
             }
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             request.setAttribute(EXCEPTION_ATTRIBUTE, "INVALID_TOKEN");
@@ -60,8 +61,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         if (jwtUtil.checkBlacklist(accessToken)) {
-            request.setAttribute(EXCEPTION_ATTRIBUTE, "INVALID_TOKEN");
-            throw new CustomException(TokenErrorCode.INVALID_TOKEN);
+            request.setAttribute(EXCEPTION_ATTRIBUTE, "ACCESS_TOKEN_NOT_EXIST");
+            throw new CustomException(TokenErrorCode.ACCESS_TOKEN_NOT_EXIST);
         }
 
         Authentication authentication = jwtUtil.getAuthentication(accessToken);
