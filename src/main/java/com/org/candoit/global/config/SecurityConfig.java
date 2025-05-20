@@ -62,7 +62,7 @@ public class SecurityConfig {
                 // 로그인, 회원가입
                 .requestMatchers("/api/auth/login", "/api/members/join"
                     ).permitAll()
-                .requestMatchers("/api/members/check").hasRole("USER")
+                .requestMatchers("/api/members/check", "/api/auth/logout").hasRole("USER")
                 .anyRequest().authenticated()
             );
 

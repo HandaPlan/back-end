@@ -2,6 +2,8 @@ package com.org.candoit.domain.auth.service;
 
 import com.org.candoit.domain.auth.dto.LoginRequest;
 import com.org.candoit.domain.auth.dto.LoginResponse;
+import com.org.candoit.domain.auth.dto.LogoutResponse;
+import com.org.candoit.global.security.jwt.JwtService;
 import com.org.candoit.global.security.jwt.JwtUtil;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     public LoginResponse login(LoginRequest loginRequest) {
 
@@ -56,5 +59,14 @@ public class AuthService {
             .build();
 
         headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    public LogoutResponse logout(String accessToken, String refreshToken) {
+        jwtService.logout(accessToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        refreshTokenSend2Client(headers, refreshToken, 0);
+
+        return new LogoutResponse(headers);
     }
 }
