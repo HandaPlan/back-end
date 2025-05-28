@@ -59,8 +59,8 @@ public class SecurityConfig {
                 .requestMatchers("/",
                     "/swagger-ui/**",
                     "/v3/api-docs/**").permitAll()
-                // 로그인, 회원가입
-                .requestMatchers("/api/auth/login", "/api/members/join"
+                // 로그인, 회원가입, 토큰 재발행
+                .requestMatchers("/api/auth/login", "/api/members/join", "/api/auth/reissue"
                     ).permitAll()
                 .requestMatchers("/api/members/check", "/api/auth/logout").hasRole("USER")
                 .anyRequest().authenticated()

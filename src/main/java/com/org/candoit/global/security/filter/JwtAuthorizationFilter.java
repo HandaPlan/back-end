@@ -1,6 +1,7 @@
 package com.org.candoit.global.security.filter;
 
 import com.org.candoit.global.response.CustomException;
+import com.org.candoit.global.security.basic.CustomUserDetails;
 import com.org.candoit.global.security.jwt.JwtUtil;
 import com.org.candoit.global.security.jwt.TokenErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,11 +13,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String EXCEPTION_ATTRIBUTE = "exception";
@@ -25,7 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final Set<String> excludeAllPaths = Set.of(
         "/swagger-ui/**", "/v3/api-docs/**",
-        "/api/auth/login", "/api/members/join"
+        "/api/auth/login", "/api/members/join", "/api/auth/reissue"
     );
 
     public JwtAuthorizationFilter(JwtUtil jwtUtil) {
@@ -66,6 +69,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         Authentication authentication = jwtUtil.getAuthentication(accessToken);
+        log.info("로그인한 사용자: {}", ((CustomUserDetails)authentication.getPrincipal()).getMember().getNickname());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);

@@ -120,6 +120,14 @@ public class JwtUtil {
                 TimeUnit.SECONDS);
     }
 
+    public void validateAccessTokenExpiration(Claims accessTokenClaims, String accessToken) {
+        Date accessTokenExpirationDate = accessTokenClaims.getExpiration();
+
+        if(accessTokenExpirationDate.after(new Date())) {
+            addBlackListExistingAccessToken(accessToken, accessTokenExpirationDate);
+        }
+    }
+
     public Authentication getAuthentication(String token) {
 
         String memberId = parseToken(token).getSubject();

@@ -3,6 +3,7 @@ package com.org.candoit.domain.auth.controller;
 import com.org.candoit.domain.auth.dto.LoginRequest;
 import com.org.candoit.domain.auth.dto.LoginResponse;
 import com.org.candoit.domain.auth.dto.LogoutResponse;
+import com.org.candoit.domain.auth.dto.ReissueResponse;
 import com.org.candoit.domain.auth.service.AuthService;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,6 +40,15 @@ public class AuthController {
     ) {
         LogoutResponse logoutResponse = authService.logout(accessToken, refreshToken);
         return ResponseEntity.ok().headers(logoutResponse.getHttpHeaders())
+            .body(ApiResponse.successWithoutData());
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<Object>> reissue(
+        @RequestHeader("Authorization") String accessToken,
+        @Parameter(hidden = true) @CookieValue(name = "refresh-token") String refreshToken) {
+        ReissueResponse reissueResponse = authService.reissue(accessToken, refreshToken);
+        return ResponseEntity.ok().headers(reissueResponse.getHttpHeaders())
             .body(ApiResponse.successWithoutData());
     }
 }
