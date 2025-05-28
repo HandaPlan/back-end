@@ -3,6 +3,8 @@ package com.org.candoit.domain.auth.service;
 import com.org.candoit.domain.auth.dto.LoginRequest;
 import com.org.candoit.domain.auth.dto.LoginResponse;
 import com.org.candoit.domain.auth.dto.LogoutResponse;
+import com.org.candoit.domain.auth.dto.NewTokenResponse;
+import com.org.candoit.domain.auth.dto.ReissueResponse;
 import com.org.candoit.global.security.jwt.JwtService;
 import com.org.candoit.global.security.jwt.JwtUtil;
 import java.time.Duration;
@@ -68,5 +70,15 @@ public class AuthService {
         refreshTokenSend2Client(headers, refreshToken, 0);
 
         return new LogoutResponse(headers);
+    }
+
+    public ReissueResponse reissue(String refreshToken, String accessToken) {
+
+        NewTokenResponse newTokenResponse = jwtService.reissue(refreshToken, accessToken);
+        HttpHeaders headers = new HttpHeaders();
+        accessTokenSend2Client(headers, newTokenResponse.getAccessToken());
+        refreshTokenSend2Client(headers, newTokenResponse.getRefreshToken(), 7);
+
+        return new ReissueResponse(headers);
     }
 }
