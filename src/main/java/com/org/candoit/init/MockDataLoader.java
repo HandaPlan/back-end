@@ -1,3 +1,4 @@
+/*
 package com.org.candoit.init;
 
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
@@ -215,3 +216,4 @@ public class MockDataLoader implements ApplicationRunner {
         log.info("목 데이터 삽입 종료");
     }
 }
+*/
