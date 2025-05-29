@@ -29,8 +29,6 @@ public class DailyProgress extends BaseTimeEntity {
 
     private LocalDate checkedDate;
 
-    private Boolean isChecked;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_action_id")
     private DailyAction dailyAction;

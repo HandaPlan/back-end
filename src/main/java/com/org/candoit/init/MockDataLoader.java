@@ -1,4 +1,3 @@
-/*
 package com.org.candoit.init;
 
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
@@ -196,19 +195,16 @@ public class MockDataLoader implements ApplicationRunner {
         DailyProgress mockDailyProgress1 = DailyProgress.builder()
             .dailyAction(mockDailyAction3)
             .checkedDate(LocalDate.of(2025,5,1))
-            .isChecked(Boolean.TRUE)
             .build();
 
         DailyProgress mockDailyProgress2 = DailyProgress.builder()
             .dailyAction(mockDailyAction4)
             .checkedDate(LocalDate.of(2025,5,3))
-            .isChecked(Boolean.TRUE)
             .build();
 
         DailyProgress mockDailyProgress3 = DailyProgress.builder()
             .dailyAction(mockDailyAction6)
             .checkedDate(LocalDate.of(2025,5,5))
-            .isChecked(Boolean.TRUE)
             .build();
 
         dailyProgressRepository.save(mockDailyProgress1);
@@ -219,4 +215,3 @@ public class MockDataLoader implements ApplicationRunner {
         log.info("목 데이터 삽입 종료");
     }
 }
-*/
