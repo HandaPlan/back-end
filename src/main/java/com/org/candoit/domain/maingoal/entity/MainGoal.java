@@ -3,6 +3,7 @@ package com.org.candoit.domain.maingoal.entity;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,15 +28,15 @@ public class MainGoal extends BaseTimeEntity {
 
     private String mainGoalName;
 
-    private Boolean isStore;
+    private Boolean isRepresentative;
 
-    private Boolean isRep;
+    private MainGoalStatus mainGoalStatus;
 
     private Integer lastAchievementRate;
 
     private Integer thisAchievementRate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 }

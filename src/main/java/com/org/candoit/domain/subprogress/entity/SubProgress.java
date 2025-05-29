@@ -3,11 +3,13 @@ package com.org.candoit.domain.subprogress.entity;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +27,13 @@ public class SubProgress extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subProgressId;
 
-    @ManyToOne
+    private LocalDate checkedDate;
+
+    private Integer checkedCount;
+
+    private Integer targetCount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_goal_id")
     private SubGoal subGoal;
 }

@@ -16,7 +16,7 @@ import com.org.candoit.global.response.GlobalErrorCode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
     public void join(MemberJoinRequest memberJoinRequest){
@@ -34,7 +34,7 @@ public class MemberService {
         Member saveRequestMember = Member.builder()
             .email(memberJoinRequest.getEmail())
             .comment("안녕하세요.")
-            .password(bCryptPasswordEncoder.encode(memberJoinRequest.getPassword()))
+            .password(passwordEncoder.encode(memberJoinRequest.getPassword()))
             .nickname(memberJoinRequest.getNickname())
             .memberStatus(MemberStatus.ACTIVITY)
             .memberRole(MemberRole.ROLE_USER)
@@ -73,12 +73,12 @@ public class MemberService {
     public void updatePassword(Long memberId, NewPasswordRequest newPasswordRequest){
         checkVerify(memberId, "new-password");
         Member loginMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
-        loginMember.updatePassword(bCryptPasswordEncoder.encode(newPasswordRequest.getNewPassword()));
+        loginMember.updatePassword(passwordEncoder.encode(newPasswordRequest.getNewPassword()));
     }
 
     public void checkPassword(Member loginMember, CheckPasswordRequest checkPasswordRequest){
         String prefix = "check-password:"+checkPasswordRequest.getType()+":";
-        if(bCryptPasswordEncoder.matches(checkPasswordRequest.getPassword(), loginMember.getPassword())){
+        if(passwordEncoder.matches(checkPasswordRequest.getPassword(), loginMember.getPassword())){
             redisTemplate.opsForValue().set(prefix + loginMember.getMemberId(),
                "checked",
                 Duration.ofMinutes(5));

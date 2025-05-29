@@ -2,6 +2,7 @@ package com.org.candoit.domain.dailyaction.entity;
 
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +33,7 @@ public class DailyAction {
 
     private Boolean isStore;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_goal_id")
     private SubGoal subGoal;
 }

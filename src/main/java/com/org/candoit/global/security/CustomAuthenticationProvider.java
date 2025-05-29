@@ -5,20 +5,19 @@ import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.security.basic.CustomUserDetails;
 import com.org.candoit.global.security.basic.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public boolean supports(Class<?> authentication) {
@@ -42,7 +41,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new CustomException(MemberErrorCode.WITHDRAWN_MEMBER);
         }
 
-        if(password != null && !bCryptPasswordEncoder.matches(password, customUserDetails.getPassword())) {
+        if(password != null && !passwordEncoder.matches(password, customUserDetails.getPassword())) {
             throw new CustomException(MemberErrorCode.NOT_FOUND_MEMBER);
         }
 

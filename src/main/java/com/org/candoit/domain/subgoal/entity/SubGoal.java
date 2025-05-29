@@ -1,9 +1,9 @@
 package com.org.candoit.domain.subgoal.entity;
 
 import com.org.candoit.domain.maingoal.entity.MainGoal;
-import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,11 +30,7 @@ public class SubGoal extends BaseTimeEntity {
 
     private Boolean isStore;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_goal_id")
     private MainGoal mainGoal;
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
 }
