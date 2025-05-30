@@ -54,7 +54,7 @@ public class MockDataLoader implements ApplicationRunner {
 
         memberRepository.save(mockMember1);
 
-        // MainGoal
+    // MainGoal
         MainGoal mockMainGoal1 = MainGoal.builder()
             .member(mockMember1)
             .lastAchievementRate(27)

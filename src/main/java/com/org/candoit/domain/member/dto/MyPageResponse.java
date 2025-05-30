@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public class MyPageResponse {
 
-    private String profile_image;
+    private String profileImage;
     private String comment;
     private String email;
     private String nickname;

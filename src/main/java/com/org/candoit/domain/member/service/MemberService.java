@@ -15,6 +15,8 @@ import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.response.GlobalErrorCode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MemberService {
 
+    private static final Logger log = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
@@ -63,7 +66,7 @@ public class MemberService {
             MemberErrorCode.NOT_FOUND_MEMBER));
 
         return MyPageResponse.builder()
-            .profile_image(member.getProfilePath())
+            .profileImage(member.getProfilePath())
             .comment(member.getComment())
             .email(member.getEmail())
             .nickname(member.getNickname())
@@ -105,7 +108,7 @@ public class MemberService {
             memberUpdateRequest.getComment(), memberUpdateRequest.getProfile_image());
 
         return MyPageResponse.builder()
-            .profile_image(memberUpdateRequest.getProfile_image())
+            .profileImage(memberUpdateRequest.getProfile_image())
             .comment(memberUpdateRequest.getComment())
             .email(memberUpdateRequest.getEmail())
             .nickname(memberUpdateRequest.getNickname())

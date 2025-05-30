@@ -29,8 +29,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(){
-        MyPageResponse myPageResponse = memberService.getMyPage(4l);
+    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(@Parameter(hidden = true) @LoginMember Member loginMember){
+        MyPageResponse myPageResponse = memberService.getMyPage(loginMember.getMemberId());
         return ResponseEntity.ok(ApiResponse.success(myPageResponse));
     }
 
