@@ -15,6 +15,8 @@ import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.global.response.CustomException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,34 +42,31 @@ public class MainGoalService {
             .build();
 
         MainGoal savedMainGoal = mainGoalRepository.save(mainGoal);
-        ArrayList<SubGoalResponse> subGoalResponses = new ArrayList<>();
+
+        List<SubGoal> savedSubGoals = new ArrayList<>();
 
         if (!request.getSubGoalName().isEmpty()) {
-            ArrayList<SubGoal> subGoals = new ArrayList<>();
 
-            for (int i = 0; i < request.getSubGoalName().size(); i++) {
-                SubGoal subGoal = SubGoal.builder()
-                    .mainGoal(mainGoal)
+            List<SubGoal> subGoals = IntStream.range(0, request.getSubGoalName().size())
+                .mapToObj(i -> SubGoal.builder()
+                    .mainGoal(savedMainGoal)
                     .subGoalName(request.getSubGoalName().get(i))
                     .color(Color.getColor(i))
                     .isStore(Boolean.FALSE)
-                    .build();
-                subGoals.add(subGoal);
-            }
+                    .build())
+                .collect(Collectors.toList());
 
-            List<SubGoal> subGoalList = subGoalRepository.saveAll(subGoals);
-            for (SubGoal subGoal : subGoalList) {
-                SubGoalResponse subGoalResponse = SubGoalResponse.builder()
-                    .subGoalId(subGoal.getSubGoalId())
-                    .subGoalName(subGoal.getSubGoalName())
-                    .color(subGoal.getColor().getHexValue())
-                    .isStore(subGoal.getIsStore())
-                    .build();
-
-                subGoalResponses.add(subGoalResponse);
-            }
+            savedSubGoals = subGoalRepository.saveAll(subGoals);
         }
 
+        List<SubGoalResponse> subGoalResponses = savedSubGoals.stream()
+            .map(savedSubGoal -> SubGoalResponse.builder()
+                .subGoalId(savedSubGoal.getSubGoalId())
+                .subGoalName(savedSubGoal.getSubGoalName())
+                .color(savedSubGoal.getColor().getHexValue())
+                .isStore(savedSubGoal.getIsStore())
+                .build())
+            .collect(Collectors.toList());
 
         return MainGoalResponse.builder()
             .mainGoalId(savedMainGoal.getMainGoalId())
