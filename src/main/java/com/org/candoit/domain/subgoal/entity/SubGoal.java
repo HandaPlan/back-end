@@ -28,7 +28,7 @@ public class SubGoal extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subGoalId;
 
-    private String subGoalTitle;
+    private String subGoalName;
 
     private Boolean isStore;
 
