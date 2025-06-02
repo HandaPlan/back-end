@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MainGoalService {
 
     private final MainGoalRepository mainGoalRepository;
@@ -84,5 +86,28 @@ public class MainGoalService {
 
         mainGoalRepository.delete(mainGoal);
         return Boolean.TRUE;
+    }
+
+    public Boolean updateMainGoalRep(Member loginMember, Long mainGoalId){
+
+        checkedAlreadyRep(loginMember.getMemberId());
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+            .orElseThrow(() -> new CustomException(
+                MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
+        mainGoal.checkRepresentation();
+
+        return Boolean.TRUE;
+    }
+
+    private void checkedAlreadyRep(Long memberId) {
+        MainGoal mainGoal = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(memberId).orElse(null);
+
+        if (mainGoal != null) {
+            uncheckRepresentative(mainGoal);
+        }
+    }
+
+    private void uncheckRepresentative(MainGoal mainGoal) {
+        mainGoal.uncheckRepresentation();
     }
 }

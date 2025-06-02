@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface MainGoalCustomRepository {
 
     Optional<MainGoal> findByMainGoalIdAndMemberId(Long mainGoalId, Long memberId);
+    Optional<MainGoal> findRepresentativeMainGoalByMemberId(Long memberId);
 }
