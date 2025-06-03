@@ -78,6 +78,29 @@ public class MainGoalService {
         return Boolean.TRUE;
     }
 
+    public Boolean updateMainGoalRep(Member loginMember, Long mainGoalId){
+
+        checkedAlreadyRep(loginMember.getMemberId());
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+            .orElseThrow(() -> new CustomException(
+                MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
+        mainGoal.checkRepresentation();
+
+        return Boolean.TRUE;
+    }
+
+    private void checkedAlreadyRep(Long memberId) {
+        MainGoal mainGoal = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(memberId).orElse(null);
+
+        if (mainGoal != null) {
+            uncheckRepresentative(mainGoal);
+        }
+    }
+
+    private void uncheckRepresentative(MainGoal mainGoal) {
+        mainGoal.uncheckRepresentation();
+    }
+
     public MainGoalResponse updateMainGoal(Member loginMember, Long mainGoalId, UpdateMainGoalRequest updateMainGoalRequest){
         MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
             .orElseThrow(() -> new CustomException(

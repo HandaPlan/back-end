@@ -5,6 +5,8 @@ import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,6 +37,7 @@ public class MainGoal extends BaseTimeEntity {
 
     private Boolean isRepresentative;
 
+    @Enumerated(EnumType.STRING)
     private MainGoalStatus mainGoalStatus;
 
     private Integer lastAchievementRate;
@@ -47,6 +50,14 @@ public class MainGoal extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "mainGoal", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SubGoal> subGoals = new ArrayList<>();
+
+    public void uncheckRepresentation(){
+        this.isRepresentative = Boolean.FALSE;
+    }
+
+    public void checkRepresentation(){
+        this.isRepresentative = Boolean.TRUE;
+    }
 
     public void updateMainGoal(String mainGoalName, MainGoalStatus mainGoalStatus){
         this.mainGoalName = mainGoalName;

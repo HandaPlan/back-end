@@ -44,6 +44,14 @@ public class MainGoalController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
+    @PostMapping("{mainGoalId}/rep")
+    public ResponseEntity<ApiResponse<Boolean>> updateMainGoalRep(
+        @Parameter(hidden = true) @LoginMember Member member,
+        @PathVariable Long mainGoalId) {
+        Boolean result = mainGoalService.updateMainGoalRep(member, mainGoalId);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @PatchMapping("{mainGoalId}")
     public ResponseEntity<ApiResponse<MainGoalResponse>> updateMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,

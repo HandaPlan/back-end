@@ -23,4 +23,15 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .on(mainGoal.member.memberId.eq(memberId))
             .where(mainGoal.mainGoalId.eq(mainGoalId)).fetchOne());
     }
+
+    @Override
+    public Optional<MainGoal> findRepresentativeMainGoalByMemberId(Long memberId) {
+        return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
+            .from(mainGoal)
+            .innerJoin(member)
+            .on(mainGoal.member.memberId.eq(memberId))
+            .where(
+               (mainGoal.isRepresentative.eq(Boolean.TRUE)))
+            .fetchOne());
+    }
 }
