@@ -58,4 +58,9 @@ public class MainGoal extends BaseTimeEntity {
     public void checkRepresentation(){
         this.isRepresentative = Boolean.TRUE;
     }
+
+    public void updateMainGoal(String mainGoalName, MainGoalStatus mainGoalStatus){
+        this.mainGoalName = mainGoalName;
+        this.mainGoalStatus = mainGoalStatus;
+    }
 }

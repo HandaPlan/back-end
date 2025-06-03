@@ -2,6 +2,7 @@ package com.org.candoit.domain.maingoal.service;
 
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
 import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
@@ -18,14 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @RequiredArgsConstructor
 @Service
-@Slf4j
 public class MainGoalService {
 
     private final MainGoalRepository mainGoalRepository;
@@ -61,21 +60,12 @@ public class MainGoalService {
             savedSubGoals = subGoalRepository.saveAll(subGoals);
         }
 
-        List<SubGoalResponse> subGoalResponses = savedSubGoals.stream()
-            .map(savedSubGoal -> SubGoalResponse.builder()
-                .subGoalId(savedSubGoal.getSubGoalId())
-                .subGoalName(savedSubGoal.getSubGoalName())
-                .color(savedSubGoal.getColor().getHexValue())
-                .isStore(savedSubGoal.getIsStore())
-                .build())
-            .collect(Collectors.toList());
-
         return MainGoalResponse.builder()
             .mainGoalId(savedMainGoal.getMainGoalId())
             .mainGoalStatus(savedMainGoal.getMainGoalStatus())
             .mainGoalName(savedMainGoal.getMainGoalName())
             .isRepresentative(savedMainGoal.getIsRepresentative())
-            .subGoals(subGoalResponses)
+            .subGoals(createSubGoalResponse(savedSubGoals))
             .build();
     }
 
@@ -109,5 +99,32 @@ public class MainGoalService {
 
     private void uncheckRepresentative(MainGoal mainGoal) {
         mainGoal.uncheckRepresentation();
+    }
+
+    public MainGoalResponse updateMainGoal(Member loginMember, Long mainGoalId, UpdateMainGoalRequest updateMainGoalRequest){
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+            .orElseThrow(() -> new CustomException(
+                MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
+
+        mainGoal.updateMainGoal(updateMainGoalRequest.getMainGoalName(), updateMainGoalRequest.getMainGoalStatus());
+
+        return MainGoalResponse.builder()
+            .mainGoalId(mainGoal.getMainGoalId())
+            .mainGoalStatus(mainGoal.getMainGoalStatus())
+            .mainGoalName(mainGoal.getMainGoalName())
+            .isRepresentative(mainGoal.getIsRepresentative())
+            .subGoals(createSubGoalResponse(mainGoal.getSubGoals()))
+            .build();
+    }
+
+    private List<SubGoalResponse> createSubGoalResponse(List<SubGoal> subGoalList){
+        return subGoalList.stream()
+            .map(subGoal -> SubGoalResponse.builder()
+                .subGoalId(subGoal.getSubGoalId())
+                .subGoalName(subGoal.getSubGoalName())
+                .color(subGoal.getColor().getHexValue())
+                .isStore(subGoal.getIsStore())
+                .build())
+            .collect(Collectors.toList());
     }
 }
