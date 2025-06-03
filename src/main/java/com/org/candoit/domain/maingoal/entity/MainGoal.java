@@ -47,4 +47,9 @@ public class MainGoal extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "mainGoal", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SubGoal> subGoals = new ArrayList<>();
+
+    public void updateMainGoal(String mainGoalName, MainGoalStatus mainGoalStatus){
+        this.mainGoalName = mainGoalName;
+        this.mainGoalStatus = mainGoalStatus;
+    }
 }
