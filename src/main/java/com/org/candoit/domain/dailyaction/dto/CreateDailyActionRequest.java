@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class CreateDailyActionRequest {
 
-    private String dailyActionTitle;
-    private String dailyActionContent;
+    private String title;
+    private String content;
     private Integer targetNum;
 }

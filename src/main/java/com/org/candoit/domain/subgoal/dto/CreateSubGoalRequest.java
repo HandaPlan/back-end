@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class CreateSubGoalRequest {
 
-    private String subGoalName;
+    private String name;
+    private String color;
     private List<CreateDailyActionRequest> dailyActions;
 }

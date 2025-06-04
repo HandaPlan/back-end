@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateMainGoalRequest {
-    private String mainGoalName;
+    private String name;
     private List<CreateSubGoalRequest> subGoals;
 }
