@@ -1,6 +1,10 @@
 package com.org.candoit.domain.maingoal.service;
 
+import com.org.candoit.domain.dailyaction.dto.CreateDailyActionRequest;
+import com.org.candoit.domain.dailyaction.entity.DailyAction;
+import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
+import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
@@ -9,6 +13,7 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.maingoal.repository.MainGoalRepository;
 import com.org.candoit.domain.member.entity.Member;
+import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
 import com.org.candoit.domain.subgoal.dto.SubGoalResponse;
 import com.org.candoit.domain.subgoal.entity.Color;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
@@ -30,12 +35,13 @@ public class MainGoalService {
     private final MainGoalRepository mainGoalRepository;
     private final MainGoalCustomRepository mainGoalCustomRepository;
     private final SubGoalRepository subGoalRepository;
+    private final DailyActionRepository dailyActionRepository;
 
-    public MainGoalResponse createMainGoal(Member member, CreateMainGoalRequest request) {
+    public CreateMainGoalResponse createMainGoal(Member member, CreateMainGoalRequest request) {
 
         MainGoal mainGoal = MainGoal.builder()
             .member(member)
-            .mainGoalName(request.getMainGoalName())
+            .mainGoalName(request.getName())
             .mainGoalStatus(MainGoalStatus.ACTIVITY)
             .thisAchievementRate(0)
             .lastAchievementRate(0)
@@ -44,28 +50,44 @@ public class MainGoalService {
 
         MainGoal savedMainGoal = mainGoalRepository.save(mainGoal);
 
-        List<SubGoal> savedSubGoals = new ArrayList<>();
+        List<SubGoal> savedSubGoals;
 
-        if (!request.getSubGoalName().isEmpty()) {
+        if (!request.getSubGoals().isEmpty()) {
 
-            List<SubGoal> subGoals = IntStream.range(0, request.getSubGoalName().size())
+            List<SubGoal> subGoals = IntStream.range(0, request.getSubGoals().size())
                 .mapToObj(i -> SubGoal.builder()
                     .mainGoal(savedMainGoal)
-                    .subGoalName(request.getSubGoalName().get(i))
+                    .subGoalName(request.getSubGoals().get(i).getName())
                     .color(Color.getColor(i))
                     .isStore(Boolean.FALSE)
                     .build())
                 .collect(Collectors.toList());
 
             savedSubGoals = subGoalRepository.saveAll(subGoals);
+
+            List<CreateSubGoalRequest> subGoalRequest = request.getSubGoals();
+
+            List<DailyAction> dailyActions = IntStream.range(0, subGoalRequest.size())
+                .boxed()
+                .flatMap(i -> {
+                    SubGoal nowSavedSubGoal = savedSubGoals.get(i);
+                    List<CreateDailyActionRequest> dailyActionRequests = subGoalRequest.get(i).getDailyActions();
+                    return dailyActionRequests.stream()
+                        .map(req -> DailyAction.builder()
+                            .dailyActionTitle(req.getTitle())
+                            .content(req.getContent())
+                            .subGoal(nowSavedSubGoal)
+                            .targetNum(req.getTargetNum())
+                            .isStore(Boolean.FALSE)
+                            .build());
+                }).collect(Collectors.toList());
+
+            dailyActionRepository.saveAll(dailyActions);
         }
 
-        return MainGoalResponse.builder()
-            .mainGoalId(savedMainGoal.getMainGoalId())
-            .mainGoalStatus(savedMainGoal.getMainGoalStatus())
+        return CreateMainGoalResponse.builder()
             .mainGoalName(savedMainGoal.getMainGoalName())
-            .isRepresentative(savedMainGoal.getIsRepresentative())
-            .subGoals(createSubGoalResponse(savedSubGoals))
+            .mainGoalId(savedMainGoal.getMainGoalId())
             .build();
     }
 
