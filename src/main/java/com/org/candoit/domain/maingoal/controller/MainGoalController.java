@@ -1,6 +1,7 @@
 package com.org.candoit.domain.maingoal.controller;
 
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
+import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.service.MainGoalService;
@@ -27,13 +28,13 @@ public class MainGoalController {
     private final MainGoalService mainGoalService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<MainGoalResponse>> createMainGoal(
+    public ResponseEntity<ApiResponse<CreateMainGoalResponse>> createMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
         @RequestBody CreateMainGoalRequest createMainGoalRequest) {
-        MainGoalResponse mainGoalResponse = mainGoalService.createMainGoal(member,
+        CreateMainGoalResponse createMainGoalResponse = mainGoalService.createMainGoal(member,
             createMainGoalRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ApiResponse.success(mainGoalResponse));
+            .body(ApiResponse.success(createMainGoalResponse));
     }
 
     @DeleteMapping("{mainGoalId}")
