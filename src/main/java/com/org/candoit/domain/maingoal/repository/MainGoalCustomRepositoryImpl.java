@@ -4,7 +4,10 @@ import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.member.entity.QMember.member;
 
 import com.org.candoit.domain.maingoal.entity.MainGoal;
+import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -31,7 +34,20 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .innerJoin(member)
             .on(mainGoal.member.memberId.eq(memberId))
             .where(
-               (mainGoal.isRepresentative.eq(Boolean.TRUE)))
+                (mainGoal.isRepresentative.eq(Boolean.TRUE)))
             .fetchOne());
+    }
+
+    @Override
+    public List<MainGoal> findByMemberIdAndStatus(Long memberId, MainGoalStatus status) {
+        return jpaQueryFactory.select(mainGoal)
+            .from(mainGoal)
+            .where((mainGoal.member.memberId.eq(memberId)).and(
+                checkStatus(status))).fetch();
+    }
+
+    private BooleanExpression checkStatus(MainGoalStatus status) {
+        if(status == null) return null;
+        return mainGoal.mainGoalStatus.eq(status);
     }
 }
