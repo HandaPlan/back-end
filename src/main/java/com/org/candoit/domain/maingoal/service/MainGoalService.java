@@ -5,8 +5,9 @@ import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.MainGoalListCompositionResponse;
+import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
-import com.org.candoit.domain.maingoal.dto.PreviewMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
@@ -150,15 +151,17 @@ public class MainGoalService {
             .collect(Collectors.toList());
     }
 
-    public List<PreviewMainGoalResponse> getPreviewList(Member member, MainGoalStatus state) {
+    public MainGoalListResponse getPreviewList(Member member, MainGoalStatus state) {
 
-       return mainGoalCustomRepository.findByMemberIdAndStatus(member.getMemberId(), state)
-           .stream()
-           .map(mainGoal -> PreviewMainGoalResponse.builder()
-               .mainGoalId(mainGoal.getMainGoalId())
-               .mainGoalName(mainGoal.getMainGoalName())
-               .mainGoalStatus(mainGoal.getMainGoalStatus())
-               .build())
-           .collect(Collectors.toList());
+        return MainGoalListResponse.builder()
+            .mainGoals(mainGoalCustomRepository.findByMemberIdAndStatus(member.getMemberId(), state)
+                .stream()
+                .map(mainGoal -> MainGoalListCompositionResponse.builder()
+                    .id(mainGoal.getMainGoalId())
+                    .name(mainGoal.getMainGoalName())
+                    .status(mainGoal.getMainGoalStatus())
+                    .isRep(mainGoal.getIsRepresentative())
+                    .build())
+                .collect(Collectors.toList())).build();
     }
 }

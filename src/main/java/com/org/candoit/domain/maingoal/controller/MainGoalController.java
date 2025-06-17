@@ -2,8 +2,8 @@ package com.org.candoit.domain.maingoal.controller;
 
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
-import com.org.candoit.domain.maingoal.dto.PreviewMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
 import com.org.candoit.domain.maingoal.service.MainGoalService;
@@ -11,7 +11,6 @@ import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,19 +32,18 @@ public class MainGoalController {
     private final MainGoalService mainGoalService;
 
     @GetMapping
-    public ResponseEntity<List<PreviewMainGoalResponse>> getMainGoals(
+    public ResponseEntity<ApiResponse<MainGoalListResponse>> getMainGoals(
         @Parameter(hidden = true) @LoginMember Member member,
         @RequestParam(defaultValue = "all") String state
     ) {
-        List<PreviewMainGoalResponse> result = mainGoalService.getPreviewList(member, checkFiltering(state));
-        return ResponseEntity.ok(result);
+        MainGoalListResponse result = mainGoalService.getPreviewList(member, checkFiltering(state));
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     private MainGoalStatus checkFiltering(String state) {
         if(state.equalsIgnoreCase("all")) return null;
         return MainGoalStatus.valueOf(state.toUpperCase());
     }
-
 
     @PostMapping
     public ResponseEntity<ApiResponse<CreateMainGoalResponse>> createMainGoal(
