@@ -6,9 +6,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PreviewMainGoalResponse {
+public class MainGoalListCompositionResponse {
 
-    private Long mainGoalId;
-    private String mainGoalName;
-    private MainGoalStatus mainGoalStatus;
+    private Long id;
+    private String name;
+    private MainGoalStatus status;
+    private Boolean isRep;
 }
