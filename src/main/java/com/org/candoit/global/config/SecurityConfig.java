@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @RequiredArgsConstructor
 @Configuration
@@ -30,7 +31,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final CorsConfig corsConfig;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -85,6 +86,7 @@ public class SecurityConfig {
         http.exceptionHandling(
             exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint));
 
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource));
 
         return http.build();
     }
