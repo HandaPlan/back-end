@@ -15,7 +15,7 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
             "http://localhost:3000","http://localhost:8080",
-            "https://handa-plan.com", "https://api.handa-plan.com"
+            "https://handa-plan.vercel.app", "https://api.handa-plan.com"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
