@@ -5,6 +5,8 @@ import com.org.candoit.domain.auth.dto.LoginResponse;
 import com.org.candoit.domain.auth.dto.LogoutResponse;
 import com.org.candoit.domain.auth.dto.NewTokenResponse;
 import com.org.candoit.domain.auth.dto.ReissueResponse;
+import com.org.candoit.domain.member.dto.BasicMemberInfoResponse;
+import com.org.candoit.global.security.basic.CustomUserDetails;
 import com.org.candoit.global.security.jwt.JwtService;
 import com.org.candoit.global.security.jwt.JwtUtil;
 import java.time.Duration;
@@ -45,8 +47,10 @@ public class AuthService {
         accessTokenSend2Client(headers, accessToken);
         refreshTokenSend2Client(headers, refreshToken, 7);
 
-        return new LoginResponse(headers);
+        return new LoginResponse(headers,
+            new BasicMemberInfoResponse((CustomUserDetails) authentication.getPrincipal()));
     }
+
     private void accessTokenSend2Client(HttpHeaders headers, String accessToken) {
         headers.set("Authorization", "Bearer " + accessToken);
     }
