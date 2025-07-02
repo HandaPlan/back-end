@@ -27,12 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MemberService {
 
-    private static final Logger log = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
     public void join(MemberJoinRequest memberJoinRequest){
+
+        validateDuplicate(memberJoinRequest.getEmail(), memberJoinRequest.getNickname());
 
         Member saveRequestMember = Member.builder()
             .email(memberJoinRequest.getEmail())
@@ -46,15 +47,25 @@ public class MemberService {
         memberRepository.save(saveRequestMember);
     }
 
+    private void validateDuplicate(String email, String nickname){
+
+        if(memberRepository.existsByEmail(email)){
+            throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        else if(memberRepository.existsByNickname(nickname)){
+            throw new CustomException(MemberErrorCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
     public Boolean check(MemberCheckRequest memberCheckRequest){
 
         String type = memberCheckRequest.getType();
         String content = memberCheckRequest.getContent();
 
-        if(type.equals("nickname")){
-            return memberRepository.findByNickname(content).isPresent();
-        }else if(type.equals("email")){
-            return memberRepository.findByEmail(content).isPresent();
+        if("nickname".equals(type)){
+            return memberRepository.existsByNickname(content);
+        }else if("email".equals(type)){
+            return memberRepository.existsByEmail(content);
         }else {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
