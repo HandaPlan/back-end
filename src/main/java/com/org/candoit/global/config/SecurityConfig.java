@@ -63,9 +63,10 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**").permitAll()
                 // 로그인, 회원가입, 토큰 재발행
-                .requestMatchers("/api/auth/login", "/api/members/join", "/api/auth/reissue"
+                .requestMatchers("/api/auth/login", "/api/members/join", "/api/auth/reissue",
+                    "/api/members/check"
                     ).permitAll()
-                .requestMatchers("/api/members/check", "/api/auth/logout", "/api/main-goals").hasRole("USER")
+                .requestMatchers("/api/auth/logout", "/api/main-goals").hasRole("USER")
                 .anyRequest().authenticated()
             );
 

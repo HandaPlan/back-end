@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
     info = @Info(title = "한다라트 API 명세서", version = "1.0", description = "한다라트 API 명세서"),
-    servers = @Server(url = "https://api.handa-plan.com"))
+    servers = @Server(url = "https://api.handa-plan.com")
+    )
 @Configuration
 public class SwaggerConfig {
 
