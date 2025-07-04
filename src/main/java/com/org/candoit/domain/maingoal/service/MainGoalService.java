@@ -135,7 +135,7 @@ public class MainGoalService {
             .mainGoalId(mainGoal.getMainGoalId())
             .mainGoalStatus(mainGoal.getMainGoalStatus())
             .mainGoalName(mainGoal.getMainGoalName())
-            .isRepresentative(mainGoal.getIsRepresentative())
+            .isRep(mainGoal.getIsRepresentative())
             .subGoals(createSubGoalResponse(mainGoal.getSubGoals()))
             .build();
     }

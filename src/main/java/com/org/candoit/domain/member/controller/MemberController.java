@@ -47,14 +47,14 @@ public class MemberController {
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<MyPageResponse>> updateMemberInfo(@RequestBody MemberUpdateRequest memberUpdateRequest){
-        MyPageResponse myPageResponse = memberService.updateInfo(4l, memberUpdateRequest);
+    public ResponseEntity<ApiResponse<MyPageResponse>> updateMemberInfo(@Parameter(hidden = true) @LoginMember Member loginMember, @RequestBody MemberUpdateRequest memberUpdateRequest){
+        MyPageResponse myPageResponse = memberService.updateInfo(loginMember.getMemberId(), memberUpdateRequest);
         return ResponseEntity.ok(ApiResponse.success(myPageResponse));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Object>> withdraw(@RequestBody CheckPasswordRequest checkPasswordRequest){
-        memberService.withdraw(6l, checkPasswordRequest);
+    public ResponseEntity<ApiResponse<Object>> withdraw(@Parameter(hidden = true) @LoginMember Member loginMember, @RequestBody CheckPasswordRequest checkPasswordRequest){
+        memberService.withdraw(loginMember.getMemberId(), checkPasswordRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
     }
 
