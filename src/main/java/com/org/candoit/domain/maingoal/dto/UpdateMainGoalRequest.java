@@ -8,8 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class UpdateMainGoalRequest {
+
     @NotBlank
     private String mainGoalName;
-    @NotBlank
     private MainGoalStatus mainGoalStatus;
 }

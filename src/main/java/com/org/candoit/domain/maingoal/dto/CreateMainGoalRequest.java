@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateMainGoalRequest {
+
     @NotBlank
     private String name;
     private List<CreateSubGoalRequest> subGoals;
