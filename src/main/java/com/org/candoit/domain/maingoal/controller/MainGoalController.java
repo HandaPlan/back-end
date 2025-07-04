@@ -11,6 +11,7 @@ import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class MainGoalController {
     @PostMapping
     public ResponseEntity<ApiResponse<CreateMainGoalResponse>> createMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
-        @RequestBody CreateMainGoalRequest createMainGoalRequest) {
+        @Valid @RequestBody CreateMainGoalRequest createMainGoalRequest) {
         CreateMainGoalResponse createMainGoalResponse = mainGoalService.createMainGoal(member,
             createMainGoalRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -74,7 +75,7 @@ public class MainGoalController {
     @PatchMapping("{mainGoalId}")
     public ResponseEntity<ApiResponse<MainGoalResponse>> updateMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
-        @PathVariable Long mainGoalId, @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
+        @PathVariable Long mainGoalId, @Valid @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
         MainGoalResponse mainGoalResponse = mainGoalService.updateMainGoal(member, mainGoalId, updateMainGoalRequest);
         return ResponseEntity.ok(ApiResponse.success(mainGoalResponse));
     }
