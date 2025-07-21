@@ -10,6 +10,8 @@ import com.org.candoit.domain.maingoal.service.MainGoalService;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
+import com.org.candoit.global.response.CustomException;
+import com.org.candoit.global.response.GlobalErrorCode;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +44,14 @@ public class MainGoalController {
     }
 
     private MainGoalStatus checkFiltering(String state) {
-        if(state.equalsIgnoreCase("all")) return null;
-        return MainGoalStatus.valueOf(state.toUpperCase());
+
+            if ("all".equalsIgnoreCase(state)) return null;
+
+            try {
+                return MainGoalStatus.valueOf(state.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+            }
     }
 
     @PostMapping
