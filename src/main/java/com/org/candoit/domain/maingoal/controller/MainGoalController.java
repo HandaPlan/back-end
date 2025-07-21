@@ -10,7 +10,10 @@ import com.org.candoit.domain.maingoal.service.MainGoalService;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
+import com.org.candoit.global.response.CustomException;
+import com.org.candoit.global.response.GlobalErrorCode;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +44,20 @@ public class MainGoalController {
     }
 
     private MainGoalStatus checkFiltering(String state) {
-        if(state.equalsIgnoreCase("all")) return null;
-        return MainGoalStatus.valueOf(state.toUpperCase());
+
+            if ("all".equalsIgnoreCase(state)) return null;
+
+            try {
+                return MainGoalStatus.valueOf(state.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+            }
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<CreateMainGoalResponse>> createMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
-        @RequestBody CreateMainGoalRequest createMainGoalRequest) {
+        @Valid @RequestBody CreateMainGoalRequest createMainGoalRequest) {
         CreateMainGoalResponse createMainGoalResponse = mainGoalService.createMainGoal(member,
             createMainGoalRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -74,7 +83,7 @@ public class MainGoalController {
     @PatchMapping("{mainGoalId}")
     public ResponseEntity<ApiResponse<MainGoalResponse>> updateMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
-        @PathVariable Long mainGoalId, @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
+        @PathVariable Long mainGoalId, @Valid @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
         MainGoalResponse mainGoalResponse = mainGoalService.updateMainGoal(member, mainGoalId, updateMainGoalRequest);
         return ResponseEntity.ok(ApiResponse.success(mainGoalResponse));
     }

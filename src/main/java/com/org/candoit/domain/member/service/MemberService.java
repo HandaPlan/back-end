@@ -15,8 +15,6 @@ import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.response.GlobalErrorCode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ public class MemberService {
 
     public void join(MemberJoinRequest memberJoinRequest){
 
-        validateDuplicate(memberJoinRequest.getEmail(), memberJoinRequest.getNickname());
+        validateDuplicateOnJoin(memberJoinRequest.getEmail(), memberJoinRequest.getNickname());
 
         Member saveRequestMember = Member.builder()
             .email(memberJoinRequest.getEmail())
@@ -47,7 +45,7 @@ public class MemberService {
         memberRepository.save(saveRequestMember);
     }
 
-    private void validateDuplicate(String email, String nickname){
+    private void validateDuplicateOnJoin(String email, String nickname){
 
         if(memberRepository.existsByEmail(email)){
             throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
@@ -115,6 +113,8 @@ public class MemberService {
         Member updateMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(
             MemberErrorCode.NOT_FOUND_MEMBER));
 
+        validateDuplicateOnUpdate(memberUpdateRequest.getEmail(), memberUpdateRequest.getNickname(), memberId);
+
         updateMember.updateInfo(memberUpdateRequest.getEmail(), memberUpdateRequest.getNickname(),
             memberUpdateRequest.getComment(), memberUpdateRequest.getProfile_image());
 
@@ -126,11 +126,23 @@ public class MemberService {
             .build();
     }
 
+    private void validateDuplicateOnUpdate(String updateEmail, String updateNickname, Long memberId){
+        Member foundMemberByEmail = memberRepository.findByEmail(updateEmail).orElse(null);
+        Member foundMemberByNickname = memberRepository.findByNickname(updateNickname).orElse(null);
+
+        if(foundMemberByEmail != null && !foundMemberByEmail.getMemberId().equals(memberId)){
+            throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        else if(foundMemberByNickname != null && !foundMemberByNickname.getMemberId().equals(memberId)){
+            throw new CustomException(MemberErrorCode.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
     public void withdraw(Long memberId, CheckPasswordRequest checkPasswordRequest){
 
         Member memberToWithdraw = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
 
-        checkVerify(memberId, "withdraw");
+        checkVerify(memberId, checkPasswordRequest.getType());
 
         memberToWithdraw.withdraw();
     }

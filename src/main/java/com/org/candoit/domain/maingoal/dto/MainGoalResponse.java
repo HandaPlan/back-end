@@ -12,7 +12,7 @@ public class MainGoalResponse {
 
     private Long mainGoalId;
     private String mainGoalName;
-    private Boolean isRepresentative;
+    private Boolean isRep;
     private MainGoalStatus mainGoalStatus;
     private List<SubGoalResponse> subGoals;
 }

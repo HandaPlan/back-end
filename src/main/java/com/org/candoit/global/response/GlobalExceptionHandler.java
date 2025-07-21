@@ -1,7 +1,7 @@
 package com.org.candoit.global.response;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +20,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<?>> handleRuntimeException(RuntimeException e) {
         ErrorCode errorCode = GlobalErrorCode.INTERNAL_SERVER_ERROR;
+        return ResponseEntity
+            .status(errorCode.getHttpStatus())
+            .body(ApiResponse.fail(errorCode));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        ErrorCode errorCode = GlobalErrorCode.BAD_REQUEST;
         return ResponseEntity
             .status(errorCode.getHttpStatus())
             .body(ApiResponse.fail(errorCode));

@@ -11,6 +11,7 @@ import com.org.candoit.domain.member.service.MemberService;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,31 +36,31 @@ public class MemberController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<ApiResponse<Object>> join(@RequestBody MemberJoinRequest memberJoinRequest){
+    public ResponseEntity<ApiResponse<Object>> join(@Valid @RequestBody MemberJoinRequest memberJoinRequest){
         memberService.join(memberJoinRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
     }
 
     @PostMapping("/check")
-    public ResponseEntity<ApiResponse<Boolean>> check(@RequestBody MemberCheckRequest memberCheckRequest){
+    public ResponseEntity<ApiResponse<Boolean>> check(@Valid @RequestBody MemberCheckRequest memberCheckRequest){
         Boolean result = memberService.check(memberCheckRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<MyPageResponse>> updateMemberInfo(@RequestBody MemberUpdateRequest memberUpdateRequest){
-        MyPageResponse myPageResponse = memberService.updateInfo(4l, memberUpdateRequest);
+    public ResponseEntity<ApiResponse<MyPageResponse>> updateMemberInfo(@Parameter(hidden = true) @LoginMember Member loginMember, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest){
+        MyPageResponse myPageResponse = memberService.updateInfo(loginMember.getMemberId(), memberUpdateRequest);
         return ResponseEntity.ok(ApiResponse.success(myPageResponse));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Object>> withdraw(@RequestBody CheckPasswordRequest checkPasswordRequest){
-        memberService.withdraw(6l, checkPasswordRequest);
+    public ResponseEntity<ApiResponse<Object>> withdraw(@Parameter(hidden = true) @LoginMember Member loginMember, @Valid @RequestBody CheckPasswordRequest checkPasswordRequest){
+        memberService.withdraw(loginMember.getMemberId(), checkPasswordRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
     }
 
     @PostMapping("password-check")
-    public ResponseEntity<ApiResponse<Object>> checkCorrectPassword(@Parameter(hidden = true) @LoginMember Member loginMember,@RequestBody CheckPasswordRequest checkPasswordRequest){
+    public ResponseEntity<ApiResponse<Object>> checkCorrectPassword(@Parameter(hidden = true) @LoginMember Member loginMember, @Valid @RequestBody CheckPasswordRequest checkPasswordRequest){
         memberService.checkPassword(loginMember, checkPasswordRequest);
         return ResponseEntity.ok(ApiResponse.successWithoutData());
     }

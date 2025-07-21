@@ -1,6 +1,7 @@
 package com.org.candoit.domain.maingoal.dto;
 
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class UpdateMainGoalRequest {
 
+    @NotBlank
     private String mainGoalName;
     private MainGoalStatus mainGoalStatus;
 }
