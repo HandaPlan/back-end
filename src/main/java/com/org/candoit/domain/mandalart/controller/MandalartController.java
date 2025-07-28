@@ -1,6 +1,6 @@
 package com.org.candoit.domain.mandalart.controller;
 
-import com.org.candoit.domain.mandalart.dto.DetailMandalartResponse;
+import com.org.candoit.domain.mandalart.dto.MainGoalOverviewResponse;
 import com.org.candoit.domain.mandalart.service.MandalartService;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
@@ -18,9 +18,9 @@ public class MandalartController {
 
     private final MandalartService mandalartService;
 
-    @GetMapping
-    public ResponseEntity<DetailMandalartResponse> getMandalart(@Parameter(hidden = true) @LoginMember Member loginMember) {
-        DetailMandalartResponse result = mandalartService.getMandalart(loginMember);
+    @GetMapping("/main-goals")
+    public ResponseEntity<MainGoalOverviewResponse> getMandalart(@Parameter(hidden = true) @LoginMember Member loginMember) {
+        MainGoalOverviewResponse result = mandalartService.getMainGoalList(loginMember);
         return ResponseEntity.ok(result);
     }
 }
