@@ -2,7 +2,6 @@ package com.org.candoit.domain.maingoal.repository;
 
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.member.entity.QMember.member;
-
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -44,6 +43,14 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .from(mainGoal)
             .where((mainGoal.member.memberId.eq(memberId)).and(
                 checkStatus(status))).fetch();
+    }
+
+    @Override
+    public List<MainGoal> findByMemberId(Long memberId) {
+        return jpaQueryFactory.select(mainGoal)
+            .from(mainGoal)
+            .where((mainGoal.member.memberId.eq(memberId)))
+            .fetch();
     }
 
     private BooleanExpression checkStatus(MainGoalStatus status) {
