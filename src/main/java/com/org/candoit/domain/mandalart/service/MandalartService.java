@@ -39,7 +39,7 @@ public class MandalartService {
 
         if (subGoals.isEmpty()) {
             MainGoal mainGoal = mainGoalRepository.findByMainGoalIdAndMemberId(
-                    loginMember.getMemberId(), mainGoalId)
+                    mainGoalId, loginMember.getMemberId())
                 .orElseThrow(() -> new CustomException(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
             SimpleMainGoalInfoResponse simpleMainGoalInfoResponse = new SimpleMainGoalInfoResponse(
                 mainGoal.getMainGoalId(), mainGoal.getMainGoalName());
