@@ -19,9 +19,21 @@ public class SubGoalCustomRepositoryImpl implements SubGoalCustomRepository {
     public List<SubGoal> findByMemberId(Long memberId) {
         return jpaQueryFactory.select(subGoal)
             .from(subGoal)
-            .innerJoin(mainGoal)
+            .innerJoin(subGoal.mainGoal, mainGoal)
             .on(mainGoal.mainGoalId.eq(subGoal.mainGoal.mainGoalId))
             .where(mainGoal.member.memberId.eq(memberId))
+            .fetch();
+    }
+
+    @Override
+    public List<SubGoal> findByMemberIdAndMainGoalId(Long memberId, Long mainGoalId) {
+        return jpaQueryFactory.select(subGoal)
+            .from(subGoal)
+            .innerJoin(subGoal.mainGoal, mainGoal)
+            .on(mainGoal.mainGoalId.eq(subGoal.mainGoal.mainGoalId))
+            .where(mainGoal.member.memberId.eq(memberId).and(
+                subGoal.mainGoal.mainGoalId.eq(mainGoalId)
+            ))
             .fetch();
     }
 }
