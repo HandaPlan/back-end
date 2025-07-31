@@ -1,5 +1,6 @@
 package com.org.candoit.domain.mandalart.controller;
 
+import com.org.candoit.domain.dailyaction.dto.DailyActionOverviewResponse;
 import com.org.candoit.domain.mandalart.dto.MainGoalOverviewResponse;
 import com.org.candoit.domain.mandalart.dto.SubGoalOverviewResponse;
 import com.org.candoit.domain.mandalart.service.MandalartService;
@@ -31,6 +32,13 @@ public class MandalartController {
     public ResponseEntity<SubGoalOverviewResponse> getSubGoalList(
         @Parameter(hidden = true) @LoginMember Member loginMember, @PathVariable Long mainGoalId) {
         SubGoalOverviewResponse result = mandalartService.getSubGoalList(loginMember, mainGoalId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/sub-goals/{subGoalId}")
+    public ResponseEntity<DailyActionOverviewResponse> getDailyActionList(
+        @Parameter(hidden = true) @LoginMember Member loginMember, @PathVariable Long subGoalId) {
+        DailyActionOverviewResponse result = mandalartService.getDailyActionList(loginMember, subGoalId);
         return ResponseEntity.ok(result);
     }
 }
