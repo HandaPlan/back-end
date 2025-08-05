@@ -3,11 +3,15 @@ package com.org.candoit.domain.maingoal.service;
 import com.org.candoit.domain.dailyaction.dto.CreateDailyActionRequest;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
+import com.org.candoit.domain.dailyprogress.entity.DailyProgress;
+import com.org.candoit.domain.dailyprogress.repository.DailyProgressRepository;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.MainGoalDetailsResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListCompositionResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalWithStatusResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
@@ -16,11 +20,22 @@ import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.maingoal.repository.MainGoalRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
 import com.org.candoit.domain.subgoal.dto.SubGoalResponse;
 import com.org.candoit.domain.subgoal.entity.Color;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
+import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
+import com.org.candoit.domain.subprogress.dto.DetailSubProgressResponse;
+import com.org.candoit.domain.subprogress.dto.SubProgressOverviewResponse;
+import com.org.candoit.domain.subprogress.entity.SubProgress;
+import com.org.candoit.domain.subprogress.repository.SubProgressRepository;
 import com.org.candoit.global.response.CustomException;
+import com.org.candoit.global.util.DateTimeUtil;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,6 +52,9 @@ public class MainGoalService {
     private final MainGoalCustomRepository mainGoalCustomRepository;
     private final SubGoalRepository subGoalRepository;
     private final DailyActionRepository dailyActionRepository;
+    private final SubGoalCustomRepository subGoalCustomRepository;
+    private final SubProgressRepository subProgressRepository;
+    private final DailyProgressRepository dailyProgressRepository;
 
     public CreateMainGoalResponse createMainGoal(Member member, CreateMainGoalRequest request) {
 
@@ -66,13 +84,21 @@ public class MainGoalService {
 
             savedSubGoals = subGoalRepository.saveAll(subGoals);
 
+            List<SubProgress> subProgresses = savedSubGoals.stream()
+                .map(subGoal -> SubProgress.builder().subGoal(subGoal).build())
+                .collect(Collectors.toList());
+
+
+            subProgressRepository.saveAll(subProgresses);
+
             List<CreateSubGoalRequest> subGoalRequest = request.getSubGoals();
 
             List<DailyAction> dailyActions = IntStream.range(0, subGoalRequest.size())
                 .boxed()
                 .flatMap(i -> {
                     SubGoal nowSavedSubGoal = savedSubGoals.get(i);
-                    List<CreateDailyActionRequest> dailyActionRequests = subGoalRequest.get(i).getDailyActions();
+                    List<CreateDailyActionRequest> dailyActionRequests = subGoalRequest.get(i)
+                        .getDailyActions();
                     return dailyActionRequests.stream()
                         .map(req -> DailyAction.builder()
                             .dailyActionTitle(req.getTitle())
@@ -83,7 +109,13 @@ public class MainGoalService {
                             .build());
                 }).collect(Collectors.toList());
 
-            dailyActionRepository.saveAll(dailyActions);
+            List<DailyAction> savedDailyActions = dailyActionRepository.saveAll(dailyActions);
+
+            List<DailyProgress> dailyProgresses = savedDailyActions.stream()
+                .map(dailyAction -> DailyProgress.builder().dailyAction(dailyAction).build())
+                .collect(Collectors.toList());
+
+            dailyProgressRepository.saveAll(dailyProgresses);
         }
 
         return CreateMainGoalResponse.builder()
@@ -93,7 +125,8 @@ public class MainGoalService {
     }
 
     public Boolean deleteMainGoal(Member loginMember, Long mainGoalId) {
-        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
+                loginMember.getMemberId())
             .orElseThrow(() -> new CustomException(
                 MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
 
@@ -101,10 +134,11 @@ public class MainGoalService {
         return Boolean.TRUE;
     }
 
-    public Boolean updateMainGoalRep(Member loginMember, Long mainGoalId){
+    public Boolean updateMainGoalRep(Member loginMember, Long mainGoalId) {
 
         checkedAlreadyRep(loginMember.getMemberId());
-        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
+                loginMember.getMemberId())
             .orElseThrow(() -> new CustomException(
                 MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
         mainGoal.checkRepresentation();
@@ -113,7 +147,8 @@ public class MainGoalService {
     }
 
     private void checkedAlreadyRep(Long memberId) {
-        MainGoal mainGoal = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(memberId).orElse(null);
+        MainGoal mainGoal = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(memberId)
+            .orElse(null);
 
         if (mainGoal != null) {
             uncheckRepresentative(mainGoal);
@@ -124,12 +159,15 @@ public class MainGoalService {
         mainGoal.uncheckRepresentation();
     }
 
-    public MainGoalResponse updateMainGoal(Member loginMember, Long mainGoalId, UpdateMainGoalRequest updateMainGoalRequest){
-        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+    public MainGoalResponse updateMainGoal(Member loginMember, Long mainGoalId,
+        UpdateMainGoalRequest updateMainGoalRequest) {
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
+                loginMember.getMemberId())
             .orElseThrow(() -> new CustomException(
                 MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
 
-        mainGoal.updateMainGoal(updateMainGoalRequest.getMainGoalName(), updateMainGoalRequest.getMainGoalStatus());
+        mainGoal.updateMainGoal(updateMainGoalRequest.getMainGoalName(),
+            updateMainGoalRequest.getMainGoalStatus());
 
         return MainGoalResponse.builder()
             .mainGoalId(mainGoal.getMainGoalId())
@@ -140,7 +178,7 @@ public class MainGoalService {
             .build();
     }
 
-    private List<SubGoalResponse> createSubGoalResponse(List<SubGoal> subGoalList){
+    private List<SubGoalResponse> createSubGoalResponse(List<SubGoal> subGoalList) {
         return subGoalList.stream()
             .map(subGoal -> SubGoalResponse.builder()
                 .subGoalId(subGoal.getSubGoalId())
@@ -163,5 +201,65 @@ public class MainGoalService {
                     .isRep(mainGoal.getIsRepresentative())
                     .build())
                 .collect(Collectors.toList())).build();
+    }
+
+    public MainGoalDetailsResponse getMainGoalDetails(Member loginMember, Long mainGoalId) {
+
+        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
+                loginMember.getMemberId())
+            .orElseThrow(() -> new CustomException(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
+        List<SubGoal> subGoals = subGoalCustomRepository.findByMainGoalId(mainGoalId);
+        List<SubGoalPreviewResponse> subGoalPreview = new ArrayList<>();
+        List<DetailSubProgressResponse> detailSubProgress = new ArrayList<>();
+
+        SimpleMainGoalWithStatusResponse simpleMainGoalWithStatus = new SimpleMainGoalWithStatusResponse(
+            mainGoal.getMainGoalId(), mainGoal.getMainGoalName(), mainGoal.getMainGoalStatus());
+        subGoals.forEach(subGoal -> {
+            subGoalPreview.add(SubGoalPreviewResponse.builder()
+                .id(subGoal.getSubGoalId())
+                .name(subGoal.getSubGoalName())
+                .color(subGoal.getColor().getHexValue())
+                .attainment(subGoal.getIsStore())
+                .build());
+
+            SubProgress subProgress = subProgressRepository.findBySubGoal_SubGoalId(subGoal.getSubGoalId());
+            Integer checked = subProgress.getCheckedCount();
+            Integer target = subProgress.getTargetCount();
+
+            int rate;
+            if (checked == null || checked == 0 || target == null) {
+                rate = 0;
+            } else {
+                rate = target / checked;
+            }
+
+            detailSubProgress.add(
+                new DetailSubProgressResponse(
+                    subGoal.getSubGoalName(),
+                    subGoal.getColor().getHexValue(),
+                    rate
+                )
+            );
+
+        });
+
+        LocalDate now = LocalDate.now();
+        LocalDate monday = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate friday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+
+        int weekOfMonth = DateTimeUtil.getWeekOfMonth(now);
+
+        SubProgressOverviewResponse subProgressOverview = SubProgressOverviewResponse.builder()
+            .startDate(monday)
+            .endDate(friday)
+            .weekOfMonth(weekOfMonth)
+            .subProgress(detailSubProgress)
+            .build();
+
+        return MainGoalDetailsResponse.builder()
+            .mainGoal(simpleMainGoalWithStatus)
+            .subGoals(subGoalPreview)
+            .progress(subProgressOverview)
+            .build();
     }
 }

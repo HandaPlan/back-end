@@ -9,4 +9,5 @@ public interface SubGoalCustomRepository {
     List<SubGoal> findByMemberId(Long memberId);
     List<SubGoal> findByMemberIdAndMainGoalId(Long memberId, Long mainGoalId);
     Optional<SubGoal> findByMemberIdAndSubGoalId(Long memberId, Long subGoalId);
+    List<SubGoal> findByMainGoalId(Long mainGoalId);
 }

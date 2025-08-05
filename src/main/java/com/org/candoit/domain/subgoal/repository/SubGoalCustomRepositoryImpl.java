@@ -48,4 +48,11 @@ public class SubGoalCustomRepositoryImpl implements SubGoalCustomRepository {
             ))
             .fetchOne());
     }
+
+    @Override
+    public List<SubGoal> findByMainGoalId(Long mainGoalId) {
+        return jpaQueryFactory.selectFrom(subGoal)
+            .where(subGoal.mainGoal.mainGoalId.eq(mainGoalId))
+            .fetch();
+    }
 }
