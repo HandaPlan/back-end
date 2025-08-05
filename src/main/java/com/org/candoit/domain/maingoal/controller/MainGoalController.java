@@ -2,6 +2,7 @@ package com.org.candoit.domain.maingoal.controller;
 
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.MainGoalDetailsResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
@@ -86,5 +87,14 @@ public class MainGoalController {
         @PathVariable Long mainGoalId, @Valid @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
         MainGoalResponse mainGoalResponse = mainGoalService.updateMainGoal(member, mainGoalId, updateMainGoalRequest);
         return ResponseEntity.ok(ApiResponse.success(mainGoalResponse));
+    }
+
+    @GetMapping("{mainGoalId}")
+    public ResponseEntity<ApiResponse<MainGoalDetailsResponse>> getMainGoalDetail(
+        @Parameter(hidden = true) @LoginMember Member member,
+        @PathVariable Long mainGoalId) {
+
+        MainGoalDetailsResponse result = mainGoalService.getMainGoalDetails(member, mainGoalId);
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
