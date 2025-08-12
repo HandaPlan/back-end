@@ -1,10 +1,11 @@
 package com.org.candoit.domain.maingoal.controller;
 
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
-import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalDetailsResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalInfoResponse;
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalWithStatusResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
 import com.org.candoit.domain.maingoal.service.MainGoalService;
@@ -56,10 +57,10 @@ public class MainGoalController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CreateMainGoalResponse>> createMainGoal(
+    public ResponseEntity<ApiResponse<SimpleMainGoalInfoResponse>> createMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
         @Valid @RequestBody CreateMainGoalRequest createMainGoalRequest) {
-        CreateMainGoalResponse createMainGoalResponse = mainGoalService.createMainGoal(member,
+        SimpleMainGoalInfoResponse createMainGoalResponse = mainGoalService.createMainGoal(member,
             createMainGoalRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(createMainGoalResponse));
@@ -82,11 +83,11 @@ public class MainGoalController {
     }
 
     @PatchMapping("{mainGoalId}")
-    public ResponseEntity<ApiResponse<MainGoalResponse>> updateMainGoal(
+    public ResponseEntity<ApiResponse<SimpleMainGoalWithStatusResponse>> updateMainGoal(
         @Parameter(hidden = true) @LoginMember Member member,
         @PathVariable Long mainGoalId, @Valid @RequestBody UpdateMainGoalRequest updateMainGoalRequest) {
-        MainGoalResponse mainGoalResponse = mainGoalService.updateMainGoal(member, mainGoalId, updateMainGoalRequest);
-        return ResponseEntity.ok(ApiResponse.success(mainGoalResponse));
+        SimpleMainGoalWithStatusResponse updateMainGoalResponse = mainGoalService.updateMainGoal(member, mainGoalId, updateMainGoalRequest);
+        return ResponseEntity.ok(ApiResponse.success(updateMainGoalResponse));
     }
 
     @GetMapping("{mainGoalId}")
