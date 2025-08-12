@@ -6,11 +6,10 @@ import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
 import com.org.candoit.domain.dailyprogress.entity.DailyProgress;
 import com.org.candoit.domain.dailyprogress.repository.DailyProgressRepository;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
-import com.org.candoit.domain.maingoal.dto.CreateMainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalDetailsResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListCompositionResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
-import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalInfoResponse;
 import com.org.candoit.domain.maingoal.dto.SimpleMainGoalWithStatusResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
@@ -56,7 +55,7 @@ public class MainGoalService {
     private final SubProgressRepository subProgressRepository;
     private final DailyProgressRepository dailyProgressRepository;
 
-    public CreateMainGoalResponse createMainGoal(Member member, CreateMainGoalRequest request) {
+    public SimpleMainGoalInfoResponse createMainGoal(Member member, CreateMainGoalRequest request) {
 
         MainGoal mainGoal = MainGoal.builder()
             .member(member)
@@ -118,10 +117,7 @@ public class MainGoalService {
             dailyProgressRepository.saveAll(dailyProgresses);
         }
 
-        return CreateMainGoalResponse.builder()
-            .mainGoalName(savedMainGoal.getMainGoalName())
-            .mainGoalId(savedMainGoal.getMainGoalId())
-            .build();
+        return new SimpleMainGoalInfoResponse(savedMainGoal.getMainGoalId(), savedMainGoal.getMainGoalName());
     }
 
     public Boolean deleteMainGoal(Member loginMember, Long mainGoalId) {
@@ -159,7 +155,7 @@ public class MainGoalService {
         mainGoal.uncheckRepresentation();
     }
 
-    public MainGoalResponse updateMainGoal(Member loginMember, Long mainGoalId,
+    public SimpleMainGoalWithStatusResponse updateMainGoal(Member loginMember, Long mainGoalId,
         UpdateMainGoalRequest updateMainGoalRequest) {
         MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
                 loginMember.getMemberId())
@@ -169,13 +165,8 @@ public class MainGoalService {
         mainGoal.updateMainGoal(updateMainGoalRequest.getMainGoalName(),
             updateMainGoalRequest.getMainGoalStatus());
 
-        return MainGoalResponse.builder()
-            .mainGoalId(mainGoal.getMainGoalId())
-            .mainGoalStatus(mainGoal.getMainGoalStatus())
-            .mainGoalName(mainGoal.getMainGoalName())
-            .isRep(mainGoal.getIsRepresentative())
-            .subGoals(createSubGoalResponse(mainGoal.getSubGoals()))
-            .build();
+        return new SimpleMainGoalWithStatusResponse(mainGoal.getMainGoalId(),
+            mainGoal.getMainGoalName(), mainGoal.getMainGoalStatus());
     }
 
     private List<SubGoalResponse> createSubGoalResponse(List<SubGoal> subGoalList) {
