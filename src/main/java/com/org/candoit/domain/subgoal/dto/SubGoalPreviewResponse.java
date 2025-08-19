@@ -9,6 +9,6 @@ public class SubGoalPreviewResponse {
 
     private Long id;
     private String name;
-    private String color;
+    private Integer slotNum;
     private Boolean attainment;
 }

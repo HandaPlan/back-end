@@ -4,6 +4,7 @@ import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.global.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -37,8 +38,8 @@ public class SubGoal extends BaseTimeEntity {
 
     private Boolean isStore;
 
-    @Enumerated(EnumType.STRING)
-    private Color color;
+    @Column(nullable = false)
+    private Integer slotNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_goal_id")

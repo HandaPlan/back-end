@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### yml 파일 ###
-application.yml
+**/application*.yml
 
 ### OS ###
 Thumbs.db

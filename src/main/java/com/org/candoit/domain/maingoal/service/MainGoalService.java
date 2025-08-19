@@ -21,7 +21,6 @@ import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
 import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
 import com.org.candoit.domain.subgoal.dto.SubGoalResponse;
-import com.org.candoit.domain.subgoal.entity.Color;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
@@ -76,7 +75,7 @@ public class MainGoalService {
                 .mapToObj(i -> SubGoal.builder()
                     .mainGoal(savedMainGoal)
                     .subGoalName(request.getSubGoals().get(i).getName())
-                    .color(Color.getColor(i))
+                    .slotNum(i + 1)
                     .isStore(Boolean.FALSE)
                     .build())
                 .collect(Collectors.toList());
@@ -174,8 +173,8 @@ public class MainGoalService {
             .map(subGoal -> SubGoalResponse.builder()
                 .subGoalId(subGoal.getSubGoalId())
                 .subGoalName(subGoal.getSubGoalName())
-                .color(subGoal.getColor().getHexValue())
-                .isStore(subGoal.getIsStore())
+                .slotNum(subGoal.getSlotNum())
+                .attainment(subGoal.getIsStore())
                 .build())
             .collect(Collectors.toList());
     }
@@ -209,7 +208,7 @@ public class MainGoalService {
             subGoalPreview.add(SubGoalPreviewResponse.builder()
                 .id(subGoal.getSubGoalId())
                 .name(subGoal.getSubGoalName())
-                .color(subGoal.getColor().getHexValue())
+                .slotNum(subGoal.getSlotNum())
                 .attainment(subGoal.getIsStore())
                 .build());
 
@@ -227,7 +226,7 @@ public class MainGoalService {
             detailSubProgress.add(
                 new DetailSubProgressResponse(
                     subGoal.getSubGoalName(),
-                    subGoal.getColor().getHexValue(),
+                    subGoal.getSlotNum(),
                     rate
                 )
             );
