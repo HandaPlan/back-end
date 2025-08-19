@@ -1,6 +1,5 @@
 package com.org.candoit.domain.subprogress.dto;
 
-import com.org.candoit.domain.subgoal.entity.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,6 +8,6 @@ import lombok.Getter;
 public class DetailSubProgressResponse {
 
     private String subGoalName;
-    private String color;
+    private Integer slotNum;
     private Integer rate;
 }

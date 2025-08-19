@@ -9,6 +9,6 @@ public class SubGoalResponse {
 
     private Long subGoalId;
     private String subGoalName;
-    private Boolean isStore;
-    private String color;
+    private Boolean attainment;
+    private Integer slotNum;
 }
