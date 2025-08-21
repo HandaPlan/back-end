@@ -1,6 +1,7 @@
 package com.org.candoit.subgoal.service;
 
 
+import static com.mysema.commons.lang.Assert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,8 +18,12 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
+import com.org.candoit.domain.subgoal.dto.UpdateSubGoalRequest;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
+import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
+import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subgoal.service.SubGoalService;
 import com.org.candoit.domain.subprogress.entity.SubProgress;
@@ -40,6 +45,8 @@ class SubGoalServiceTest {
 
     @Mock
     SubGoalRepository subGoalRepository;
+    @Mock
+    SubGoalCustomRepository subGoalCustomRepository;
     @Mock
     MainGoalCustomRepository mainGoalCustomRepository;
     @Mock
@@ -109,7 +116,42 @@ class SubGoalServiceTest {
             .hasMessageContaining(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL.getMessage())
             .extracting("errorCode")
             .isEqualTo(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL);
+    }
 
+    @Test
+    @DisplayName("서브골 이름, 달성 여부 수정 성공")
+    void givenChangeNameAndAttainment_whenUpdateSubGoal_thenSuccess(){
+        //given
+        SubGoal originSubGoal = SubGoal.builder()
+            .subGoalId(1l)
+            .subGoalName("before change")
+            .build();
+        when(subGoalCustomRepository.findByMemberIdAndSubGoalId(anyLong(), anyLong())).thenReturn(Optional.of(originSubGoal));
+        UpdateSubGoalRequest request = new UpdateSubGoalRequest("change complete", false);
+
+        //when
+        SimpleInfoWithAttainmentResponse result = subGoalService.updateSubGoal(loginMember, 1l, request);
+
+        //then
+        assertEquals(originSubGoal.getSubGoalId(), result.getId());
+        assertEquals(request.getName(), result.getName());
+        assertEquals(request.getAttainment(), result.getAttainment());
+    }
+
+    @Test
+    @DisplayName("수정을 요청하는 서브골의 아이디가 DB 내에 존재하지 않아 예외가 발생한다.")
+    void givenNotMatchSubGoaId_whenUpdateSubGoal_thenThrowNotFoundException() {
+        // given
+        when(subGoalCustomRepository.findByMemberIdAndSubGoalId(anyLong(), anyLong())).thenReturn(
+            Optional.empty());
+        UpdateSubGoalRequest request = new UpdateSubGoalRequest("change complete", false);
+
+        // when, then
+        assertThatThrownBy(() -> subGoalService.updateSubGoal(loginMember, 1l, request))
+            .isInstanceOf(CustomException.class)
+            .hasMessageContaining(SubGoalErrorCode.NOT_FOUND_SUB_GOAL.getMessage())
+            .extracting("errorCode")
+            .isEqualTo(SubGoalErrorCode.NOT_FOUND_SUB_GOAL);
     }
 
 }
