@@ -47,4 +47,9 @@ public class SubGoal extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "subGoal", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<DailyAction> dailyActions = new ArrayList<>();
+
+    public void changeSubGoalProperty(String name, Boolean attainment){
+        this.subGoalName = name;
+        this.isStore = attainment;
+    }
 }

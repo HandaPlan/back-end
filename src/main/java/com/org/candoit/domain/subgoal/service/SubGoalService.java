@@ -9,8 +9,12 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
+import com.org.candoit.domain.subgoal.dto.UpdateSubGoalRequest;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
+import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
+import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subprogress.entity.SubProgress;
 import com.org.candoit.domain.subprogress.repository.SubProgressRepository;
@@ -27,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SubGoalService {
 
     private final SubGoalRepository subGoalRepository;
+    private final SubGoalCustomRepository subGoalCustomRepository;
     private final MainGoalCustomRepository mainGoalCustomRepository;
     private final SubProgressRepository subProgressRepository;
     private final DailyActionRepository dailyActionRepository;
@@ -54,7 +59,7 @@ public class SubGoalService {
             .build();
         subProgressRepository.save(subProgress);
 
-        if(!createSubGoalRequest.getDailyActions().isEmpty()){
+        if (!createSubGoalRequest.getDailyActions().isEmpty()) {
             List<DailyAction> dailyActions = createSubGoalRequest.getDailyActions().stream()
                 .map(dailyAction ->
                     DailyAction.builder()
@@ -77,5 +82,18 @@ public class SubGoalService {
 
         return new SimpleSubGoalInfoResponse(savedSubGoal.getSubGoalId(),
             savedSubGoal.getSubGoalName());
+    }
+
+    public SimpleInfoWithAttainmentResponse updateSubGoal(Member loginMember, Long subGoalId,
+        UpdateSubGoalRequest updateSubGoalRequest) {
+
+        SubGoal updateSubgoal = subGoalCustomRepository.findByMemberIdAndSubGoalId(
+                loginMember.getMemberId(), subGoalId)
+            .orElseThrow(() -> new CustomException(SubGoalErrorCode.NOT_FOUND_SUB_GOAL));
+
+        updateSubgoal.changeSubGoalProperty(updateSubGoalRequest.getName(),
+            updateSubGoalRequest.getAttainment());
+        return new SimpleInfoWithAttainmentResponse(updateSubgoal.getSubGoalId(),
+            updateSubgoal.getSubGoalName(), updateSubGoalRequest.getAttainment());
     }
 }
