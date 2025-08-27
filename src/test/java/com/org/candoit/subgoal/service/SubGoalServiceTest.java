@@ -1,18 +1,13 @@
 package com.org.candoit.subgoal.service;
 
 
-import static com.mysema.commons.lang.Assert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
-import com.org.candoit.domain.dailyprogress.repository.DailyProgressRepository;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
@@ -26,8 +21,6 @@ import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subgoal.service.SubGoalService;
-import com.org.candoit.domain.subprogress.entity.SubProgress;
-import com.org.candoit.domain.subprogress.repository.SubProgressRepository;
 import com.org.candoit.global.response.CustomException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +42,6 @@ class SubGoalServiceTest {
     SubGoalCustomRepository subGoalCustomRepository;
     @Mock
     MainGoalCustomRepository mainGoalCustomRepository;
-    @Mock
-    SubProgressRepository subProgressRepository;
-    @Mock
-    DailyProgressRepository dailyProgressRepository;
     @Mock
     DailyActionRepository dailyActionRepository;
 
@@ -78,7 +67,6 @@ class SubGoalServiceTest {
         }
         MainGoal mainGoal = MainGoal.builder()
             .mainGoalId(1l)
-            .subGoals(alreadySavedSubGoals)
             .build();
 
         when(mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoal.getMainGoalId(),
@@ -98,8 +86,6 @@ class SubGoalServiceTest {
 
         // then
         assertEquals(request.getName(), result.getName());
-        verify(subProgressRepository).save(any(SubProgress.class));
-        verifyNoInteractions(dailyActionRepository, dailyProgressRepository);
     }
 
     @Test
