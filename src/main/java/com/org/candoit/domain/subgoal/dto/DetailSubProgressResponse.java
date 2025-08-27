@@ -1,4 +1,4 @@
-package com.org.candoit.domain.subprogress.dto;
+package com.org.candoit.domain.subgoal.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
