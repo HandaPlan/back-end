@@ -2,6 +2,7 @@ package com.org.candoit.domain.dailyprogress.entity;
 
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.global.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,9 +28,10 @@ public class DailyProgress extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dailyProgressId;
 
+    @Column(nullable = false)
     private LocalDate checkedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_action_id")
+    @JoinColumn(name = "daily_action_id", nullable = false)
     private DailyAction dailyAction;
 }
