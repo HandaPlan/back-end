@@ -1,6 +1,7 @@
 package com.org.candoit.domain.member.entity;
 
 import com.org.candoit.global.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,10 +25,13 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String nickname;
 
     private String comment;
@@ -35,9 +39,12 @@ public class Member extends BaseTimeEntity {
     private String profilePath;
 
     @Enumerated(EnumType.STRING)
-    private MemberStatus memberStatus;
+    @Column(nullable = false)
+    @Builder.Default
+    private MemberStatus memberStatus = MemberStatus.ACTIVITY;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MemberRole memberRole;
 
     public void updateInfo(String email, String nickname, String comment, String profilePath){

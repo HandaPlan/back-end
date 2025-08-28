@@ -1,6 +1,7 @@
 package com.org.candoit.domain.dailyaction.entity;
 
 import com.org.candoit.domain.subgoal.entity.SubGoal;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,15 +27,19 @@ public class DailyAction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dailyActionId;
 
+    @Column(nullable = false)
     private String dailyActionTitle;
 
     private String content;
 
+    @Column(nullable = false)
     private Integer targetNum;
 
-    private Boolean isStore;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isStore = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sub_goal_id")
+    @JoinColumn(name = "sub_goal_id", nullable = false)
     private SubGoal subGoal;
 }

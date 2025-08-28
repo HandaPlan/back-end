@@ -1,22 +1,15 @@
 package com.org.candoit.domain.subgoal.entity;
 
-import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.global.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,19 +27,19 @@ public class SubGoal extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long subGoalId;
 
+    @Column(nullable = false)
     private String subGoalName;
 
-    private Boolean isStore;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isStore = false;
 
     @Column(nullable = false)
     private Integer slotNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "main_goal_id")
+    @JoinColumn(name = "main_goal_id", nullable = false)
     private MainGoal mainGoal;
-
-    @OneToMany(mappedBy = "subGoal", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<DailyAction> dailyActions = new ArrayList<>();
 
     public void changeSubGoalProperty(String name, Boolean attainment){
         this.subGoalName = name;
