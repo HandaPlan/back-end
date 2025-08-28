@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,16 @@ public class SubGoalController {
         @Valid @RequestBody UpdateSubGoalRequest updateSubGoalRequest) {
 
         SimpleInfoWithAttainmentResponse result = subGoalService.updateSubGoal(loginMember, subGoalId, updateSubGoalRequest);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @DeleteMapping("/sub-goals/{subGoalId}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteSubGoal(
+        @Parameter(hidden = true) @LoginMember Member loginMember,
+        @PathVariable Long subGoalId
+    ){
+
+        Boolean result = subGoalService.deleteSubGoal(loginMember, subGoalId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

@@ -79,4 +79,10 @@ public class SubGoalService {
         return new SimpleInfoWithAttainmentResponse(updateSubgoal.getSubGoalId(),
             updateSubgoal.getSubGoalName(), updateSubGoalRequest.getAttainment());
     }
+
+    public Boolean deleteSubGoal(Member loginMember, Long subGoalId){
+        subGoalCustomRepository.findByMemberIdAndSubGoalId(loginMember.getMemberId(), subGoalId).orElseThrow(()->new CustomException(SubGoalErrorCode.NOT_FOUND_SUB_GOAL));
+        subGoalRepository.deleteById(subGoalId);
+        return Boolean.TRUE;
+    }
 }
