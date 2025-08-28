@@ -15,6 +15,8 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -41,5 +43,6 @@ public class DailyAction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_goal_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private SubGoal subGoal;
 }
