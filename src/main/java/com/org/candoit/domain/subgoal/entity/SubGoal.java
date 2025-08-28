@@ -15,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -39,6 +41,7 @@ public class SubGoal extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_goal_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private MainGoal mainGoal;
 
     public void changeSubGoalProperty(String name, Boolean attainment){

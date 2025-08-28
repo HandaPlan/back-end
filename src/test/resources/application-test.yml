@@ -1,13 +1,15 @@
 spring:
+  test:
+    database:
+      replace: none
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:mysql:8.0.36:///test
   jpa:
     hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
 
 
 logging:
