@@ -1,5 +1,6 @@
 package com.org.candoit.domain.subgoal.service;
 
+import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
 import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.dailyaction.repository.DailyActionCustomRepository;
@@ -112,7 +113,7 @@ public class SubGoalService {
             .slotNum(subGoal.getSlotNum())
             .attainment(subGoal.getIsStore())
             .build();
-        List<SimpleDailyActionInfoResponse> dailyActions = dailyActionCustomRepository.getSimpleDailyActionInfo(
+        List<DailyActionInfoWithAttainmentResponse> dailyActions = dailyActionCustomRepository.getSimpleDailyActionInfo(
             subGoalId);
 
         DailyProgressResponse dailyProgressResponse;
