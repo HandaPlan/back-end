@@ -6,7 +6,6 @@ import com.org.candoit.domain.dailyaction.repository.DailyActionCustomRepository
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
 import com.org.candoit.domain.dailyprogress.dto.DailyProgressResponse;
 import com.org.candoit.domain.dailyprogress.repository.DailyProgressCustomRepository;
-import com.org.candoit.domain.dailyprogress.repository.DailyProgressRepository;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
@@ -22,7 +21,6 @@ import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.global.response.CustomException;
-import com.org.candoit.global.util.DateTimeUtil;
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;

@@ -33,10 +33,10 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
     @Override
     public List<SimpleDailyActionInfoResponse> getSimpleDailyActionInfo(Long subGoalId) {
         return jpaQueryFactory.select(Projections.constructor(SimpleDailyActionInfoResponse.class,
-            dailyAction.dailyActionId,
-            dailyAction.dailyActionTitle,
-            dailyAction.content,
-            dailyAction.targetNum
+                dailyAction.dailyActionId,
+                dailyAction.dailyActionTitle,
+                dailyAction.content,
+                dailyAction.targetNum
             )).from(dailyAction)
             .innerJoin(dailyAction.subGoal, subGoal)
             .on(dailyAction.subGoal.subGoalId.eq(subGoalId))

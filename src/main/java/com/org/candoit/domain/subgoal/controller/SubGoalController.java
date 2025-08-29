@@ -47,7 +47,8 @@ public class SubGoalController {
         @PathVariable Long subGoalId,
         @Valid @RequestBody UpdateSubGoalRequest updateSubGoalRequest) {
 
-        SimpleInfoWithAttainmentResponse result = subGoalService.updateSubGoal(loginMember, subGoalId, updateSubGoalRequest);
+        SimpleInfoWithAttainmentResponse result = subGoalService.updateSubGoal(loginMember,
+            subGoalId, updateSubGoalRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
@@ -55,7 +56,7 @@ public class SubGoalController {
     public ResponseEntity<ApiResponse<Boolean>> deleteSubGoal(
         @Parameter(hidden = true) @LoginMember Member loginMember,
         @PathVariable Long subGoalId
-    ){
+    ) {
 
         Boolean result = subGoalService.deleteSubGoal(loginMember, subGoalId);
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -65,8 +66,9 @@ public class SubGoalController {
     public ResponseEntity<ApiResponse<DetailSubGoalResponse>> getSubGoal(
         @Parameter(hidden = true) @LoginMember Member loginMember,
         @PathVariable Long subGoalId, @RequestParam String period
-    ){
-        DetailSubGoalResponse result = subGoalService.getDetailSubGoal(loginMember, subGoalId, period);
+    ) {
+        DetailSubGoalResponse result = subGoalService.getDetailSubGoal(loginMember, subGoalId,
+            period);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
