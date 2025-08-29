@@ -1,5 +1,6 @@
 package com.org.candoit.domain.subgoal.dto;
 
+import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
 import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyprogress.dto.DailyProgressResponse;
 import java.util.List;
@@ -12,6 +13,6 @@ import lombok.Getter;
 @Builder
 public class DetailSubGoalResponse {
     private SubGoalPreviewResponse subGoal;
-    private List<SimpleDailyActionInfoResponse> dailyActions;
+    private List<DailyActionInfoWithAttainmentResponse> dailyActions;
     private DailyProgressResponse progress;
 }

@@ -4,6 +4,7 @@ import static com.org.candoit.domain.dailyaction.entity.QDailyAction.dailyAction
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.subgoal.entity.QSubGoal.subGoal;
 
+import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
 import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.querydsl.core.types.Projections;
@@ -31,12 +32,13 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
     }
 
     @Override
-    public List<SimpleDailyActionInfoResponse> getSimpleDailyActionInfo(Long subGoalId) {
-        return jpaQueryFactory.select(Projections.constructor(SimpleDailyActionInfoResponse.class,
+    public List<DailyActionInfoWithAttainmentResponse> getSimpleDailyActionInfo(Long subGoalId) {
+        return jpaQueryFactory.select(Projections.constructor(DailyActionInfoWithAttainmentResponse.class,
                 dailyAction.dailyActionId,
                 dailyAction.dailyActionTitle,
                 dailyAction.content,
-                dailyAction.targetNum
+                dailyAction.targetNum,
+                dailyAction.isStore
             )).from(dailyAction)
             .innerJoin(dailyAction.subGoal, subGoal)
             .on(dailyAction.subGoal.subGoalId.eq(subGoalId))
