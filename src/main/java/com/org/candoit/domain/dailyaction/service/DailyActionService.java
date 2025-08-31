@@ -62,4 +62,11 @@ public class DailyActionService {
             .attainment(dailyAction.getIsStore())
             .build();
     }
+
+    public Boolean deleteDailyAction(Member loginMember, Long dailyActionId) {
+        DailyAction dailyAction = dailyActionCustomRepository.findByMemberIdAndDailyActionId(loginMember.getMemberId(), dailyActionId).orElseThrow(()->new CustomException(
+            DailyActionErrorCode.NOT_FOUND_DAILY_ACTION));
+        dailyActionRepository.delete(dailyAction);
+        return Boolean.TRUE;
+    }
 }

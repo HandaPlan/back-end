@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,5 +45,13 @@ public class DailyActionController {
     ){
         DailyActionInfoWithAttainmentResponse result = dailyActionService.updateDailyAction(loginMember, dailyActionId, updateDailyActionRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @DeleteMapping("/daily-actions/{dailyActionId}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteDailyAction(
+        @Parameter(hidden = true) @LoginMember Member loginMember,
+        @PathVariable Long dailyActionId
+    ){
+        return ResponseEntity.ok(ApiResponse.success(dailyActionService.deleteDailyAction(loginMember, dailyActionId)));
     }
 }

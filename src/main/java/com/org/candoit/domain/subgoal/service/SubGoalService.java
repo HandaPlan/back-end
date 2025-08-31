@@ -119,8 +119,16 @@ public class SubGoalService {
         DailyProgressResponse dailyProgressResponse;
 
         LocalDate now = LocalDate.now(clock);
-        LocalDate startDay = LocalDate.now();
-        LocalDate endDay = LocalDate.now();
+        LocalDate startDay = LocalDate.now(clock);
+        LocalDate endDay = LocalDate.now(clock);
+
+        if ("week".equals(period)) {
+            startDay = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            endDay = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        } else if ("month".equals(period)) {
+            startDay = now.with(TemporalAdjusters.firstDayOfMonth());
+            endDay = now.with(TemporalAdjusters.lastDayOfMonth());
+        }
 
         // 데일리 액션이 없는 경우
         if (dailyActions.isEmpty()) {
@@ -128,15 +136,7 @@ public class SubGoalService {
             dailyProgressResponse = new DailyProgressResponse(startDay, endDay, List.of());
         }
         // 데일리 액션이 있는 경우
-        else {
-
-            if ("week".equals(period)) {
-                startDay = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                endDay = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-            } else if ("month".equals(period)) {
-                startDay = now.with(TemporalAdjusters.firstDayOfMonth());
-                endDay = now.with(TemporalAdjusters.lastDayOfMonth());
-            }
+        else{
             List<LocalDate> checkedDate = dailyProgressCustomRepository.distinctCheckedDate(
                 subGoalId, startDay, endDay);
 
