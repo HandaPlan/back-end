@@ -10,6 +10,7 @@ import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -43,5 +44,17 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
             .innerJoin(dailyAction.subGoal, subGoal)
             .on(dailyAction.subGoal.subGoalId.eq(subGoalId))
             .fetch();
+    }
+
+    @Override
+    public Optional<DailyAction> findByMemberIdAndDailyActionId(Long memberId, Long dailyActionId) {
+        return Optional.ofNullable(jpaQueryFactory.select(dailyAction)
+            .from(dailyAction)
+            .join(dailyAction.subGoal, subGoal)
+            .join(subGoal.mainGoal, mainGoal)
+            .where(
+                dailyAction.dailyActionId.eq(dailyActionId),
+                mainGoal.member.memberId.eq(memberId)
+            ).fetchOne());
     }
 }

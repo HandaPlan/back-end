@@ -45,4 +45,11 @@ public class DailyAction {
     @JoinColumn(name = "sub_goal_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private SubGoal subGoal;
+
+    public void updateDailyAction(String title, String content, Integer targetNum, Boolean attainment) {
+        this.dailyActionTitle = title;
+        this.content = content;
+        this.targetNum = targetNum;
+        this.isStore = attainment;
+    }
 }
