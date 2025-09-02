@@ -29,4 +29,13 @@ public class DailyProgressCustomRepositoryImpl implements DailyProgressCustomRep
                     .exists()
             ).fetch();
     }
+
+    @Override
+    public void deleteByDailyActionIdAndCheckedDate(Long dailyActionId, LocalDate checkedDate) {
+        jpaQueryFactory.delete(dailyProgress)
+            .where(dailyProgress.dailyAction.dailyActionId.eq(dailyActionId).and(
+                dailyProgress.checkedDate.eq(checkedDate)
+            )).execute();
+
+    }
 }
