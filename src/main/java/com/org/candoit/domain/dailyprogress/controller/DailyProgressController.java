@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,16 @@ public class DailyProgressController {
     ) {
         List<DetailProgressResponse> result = dailyProgressService.checkedDate(loginMember,
             subGoalId, checkDailyProgressRequest);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/sub-goals/{subGoalId}/daily-progress")
+    public ResponseEntity<ApiResponse<List<DetailProgressResponse>>> getDailyProgress(
+        @Parameter(hidden = true) @LoginMember Member loginMember,
+        @PathVariable Long subGoalId
+    ) {
+        List<DetailProgressResponse> result = dailyProgressService.getDailyProgress(loginMember,
+            subGoalId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
