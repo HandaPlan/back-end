@@ -1,11 +1,13 @@
 package com.org.candoit.domain.dailyprogress.controller;
 
-import com.org.candoit.domain.dailyprogress.dto.CheckDailyProgressRequest;
+import com.org.candoit.domain.dailyaction.dto.ActionDates;
+import com.org.candoit.domain.dailyprogress.dto.DetailProgressResponse;
 import com.org.candoit.domain.dailyprogress.service.DailyProgressService;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +23,14 @@ public class DailyProgressController {
 
     private final DailyProgressService dailyProgressService;
 
-    @PostMapping("/daily-actions/{dailyActionId}/daily-progress")
-    public ResponseEntity<ApiResponse<Boolean>> checkedDate(
+    @PostMapping("/sub-goals/{subGoalId}/daily-progress")
+    public ResponseEntity<ApiResponse<List<DetailProgressResponse>>> checkedDate(
         @Parameter(hidden = true) @LoginMember Member loginMember,
-        @PathVariable Long dailyActionId,
-        @RequestBody CheckDailyProgressRequest checkDailyProgressRequest
-    ){
-
-        Boolean result = dailyProgressService.checkedDate(loginMember, dailyActionId, checkDailyProgressRequest);
+        @PathVariable Long subGoalId,
+        @RequestBody List<ActionDates> checkDailyProgressRequest
+    ) {
+        List<DetailProgressResponse> result = dailyProgressService.checkedDate(loginMember,
+            subGoalId, checkDailyProgressRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

@@ -1,15 +1,24 @@
 package com.org.candoit.domain.dailyaction.repository;
 
 import static com.org.candoit.domain.dailyaction.entity.QDailyAction.dailyAction;
+import static com.org.candoit.domain.dailyprogress.entity.QDailyProgress.dailyProgress;
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.subgoal.entity.QSubGoal.subGoal;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
-import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
+import com.org.candoit.domain.dailyprogress.dto.DailyProgressRow;
+import com.org.candoit.domain.dailyprogress.dto.DetailProgressResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -56,5 +65,39 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
                 dailyAction.dailyActionId.eq(dailyActionId),
                 mainGoal.member.memberId.eq(memberId)
             ).fetchOne());
+    }
+
+    @Override
+    public List<DetailProgressResponse> getActionDates(Long subGoalId, LocalDate start,
+        LocalDate end) {
+        List<DailyProgressRow> result = jpaQueryFactory
+            .select(Projections.constructor(
+                DailyProgressRow.class,
+                dailyAction.dailyActionId,
+                dailyProgress.checkedDate
+            ))
+            .from(dailyAction)
+            .leftJoin(dailyProgress)
+            .on(dailyProgress.dailyAction.eq(dailyAction),
+                dailyProgress.checkedDate.between(start, end))
+            .where(dailyAction.subGoal.subGoalId.eq(subGoalId))
+            .orderBy(dailyAction.dailyActionId.asc(), dailyProgress.checkedDate.asc())
+            .fetch();
+
+        Map<Long, List<LocalDate>> group = result.stream()
+            .collect(groupingBy(
+                DailyProgressRow::dailyActionId,
+                LinkedHashMap::new,
+                mapping(DailyProgressRow::checkedDate, toList())
+            ));
+
+        return group.entrySet().stream()
+            .map(e -> {
+                List<LocalDate> dates = e.getValue().stream()
+                    .filter(Objects::nonNull)
+                    .toList();
+                return new DetailProgressResponse(e.getKey(), dates);
+            })
+            .toList();
     }
 }
