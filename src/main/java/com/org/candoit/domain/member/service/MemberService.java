@@ -142,14 +142,10 @@ public class MemberService {
 
         Member memberToWithdraw = memberRepository.findById(memberId)
             .orElseThrow(() -> new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
-        System.out.println("raw=" + checkPasswordRequest.getPassword());
-        System.out.println("encoded=" + memberToWithdraw.getPassword());
-        System.out.println("matches=" +
-            passwordEncoder.matches(checkPasswordRequest.getPassword(), memberToWithdraw.getPassword()));
 
         if (!passwordEncoder.matches(checkPasswordRequest.getPassword(),
             memberToWithdraw.getPassword())) {
-           throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
+            throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
         }
         memberToWithdraw.withdraw();
     }
