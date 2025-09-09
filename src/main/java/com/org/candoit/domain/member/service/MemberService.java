@@ -138,12 +138,15 @@ public class MemberService {
         }
     }
 
-    public void withdraw(Long memberId, CheckPasswordRequest checkPasswordRequest){
+    public void withdraw(Long memberId, CheckPasswordRequest checkPasswordRequest) {
 
-        Member memberToWithdraw = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
+        Member memberToWithdraw = memberRepository.findById(memberId)
+            .orElseThrow(() -> new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
 
-        checkVerify(memberId, checkPasswordRequest.getType());
-
+        if (!passwordEncoder.matches(checkPasswordRequest.getPassword(),
+            memberToWithdraw.getPassword())) {
+           new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
+        }
         memberToWithdraw.withdraw();
     }
 }
