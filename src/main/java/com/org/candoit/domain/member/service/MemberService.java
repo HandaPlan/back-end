@@ -145,7 +145,7 @@ public class MemberService {
 
         if (!passwordEncoder.matches(checkPasswordRequest.getPassword(),
             memberToWithdraw.getPassword())) {
-           new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
+            throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
         }
         memberToWithdraw.withdraw();
     }
