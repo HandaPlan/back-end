@@ -47,10 +47,10 @@ public class MemberService {
 
     private void validateDuplicateOnJoin(String email, String nickname){
 
-        if(memberRepository.existsByEmail(email)){
+        if(memberRepository.existsByEmailAndMemberStatus(email, MemberStatus.ACTIVITY)){
             throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
         }
-        else if(memberRepository.existsByNickname(nickname)){
+        else if(memberRepository.existsByNicknameAndMemberStatus(nickname, MemberStatus.ACTIVITY)){
             throw new CustomException(MemberErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }
@@ -61,9 +61,9 @@ public class MemberService {
         String content = memberCheckRequest.getContent();
 
         if("nickname".equals(type)){
-            return memberRepository.existsByNickname(content);
+            return memberRepository.existsByNicknameAndMemberStatus(content, MemberStatus.ACTIVITY);
         }else if("email".equals(type)){
-            return memberRepository.existsByEmail(content);
+            return memberRepository.existsByEmailAndMemberStatus(content, MemberStatus.ACTIVITY);
         }else {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
@@ -126,9 +126,10 @@ public class MemberService {
             .build();
     }
 
-    private void validateDuplicateOnUpdate(String updateEmail, String updateNickname, Long memberId){
-        Member foundMemberByEmail = memberRepository.findByEmail(updateEmail).orElse(null);
-        Member foundMemberByNickname = memberRepository.findByNickname(updateNickname).orElse(null);
+    private void validateDuplicateOnUpdate(String updateEmail, String updateNickname,
+        Long memberId) {
+        Member foundMemberByEmail = memberRepository.findByEmailAndMemberStatus(updateEmail, MemberStatus.ACTIVITY).orElse(null);
+        Member foundMemberByNickname = memberRepository.findByNicknameAndMemberStatus(updateNickname, MemberStatus.ACTIVITY).orElse(null);
 
         if(foundMemberByEmail != null && !foundMemberByEmail.getMemberId().equals(memberId)){
             throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
