@@ -6,7 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class SubProgressCalDto {
+    private Long subGoalId;
     private Long dailyActionId;
     private Integer targetNum;
-    private Integer progressCount;
+    private Long progressCount;
 }

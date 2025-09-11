@@ -23,9 +23,11 @@ import com.org.candoit.domain.subgoal.dto.SubGoalResponse;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
+import com.org.candoit.domain.subprogress.dto.Direction;
 import com.org.candoit.domain.subprogress.dto.SubProgressCalDto;
 import com.org.candoit.domain.subprogress.dto.SubProgressOverviewResponse;
 import com.org.candoit.domain.subprogress.repository.SubProgressQueryRepository;
+import com.org.candoit.domain.subprogress.service.SubProgressService;
 import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.util.DateTimeUtil;
 import java.time.Clock;
@@ -51,6 +53,7 @@ public class MainGoalService {
     private final DailyActionRepository dailyActionRepository;
     private final SubGoalCustomRepository subGoalCustomRepository;
     private final SubProgressQueryRepository subProgressQueryRepository;
+    private final SubProgressService subProgressService;
     private final Clock clock;
 
     public SimpleMainGoalInfoResponse createMainGoal(Member member, CreateMainGoalRequest request) {
@@ -180,7 +183,6 @@ public class MainGoalService {
                 .collect(Collectors.toList())).build();
     }
 
-    // TODO: subProgress 로직 완성하기
     public MainGoalDetailsResponse getMainGoalDetails(Member loginMember, Long mainGoalId) {
 
         MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
@@ -200,52 +202,11 @@ public class MainGoalService {
                 .build());
         });
 
-        LocalDate now = LocalDate.now(clock);
-        LocalDate monday = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate sunday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-
-        List<DetailSubProgressResponse> detailSubProgress = new ArrayList<>();
-
-        for (SubGoal subGoal : subGoals) {
-            List<SubProgressCalDto> subProgress = subProgressQueryRepository.aggregate(
-                subGoal.getSubGoalId(), monday, sunday);
-            detailSubProgress.add(
-                new DetailSubProgressResponse(subGoal.getSubGoalName(), subGoal.getSlotNum(),
-                    calculateRate(subProgress)));
-        }
-
-        int weekOfMonth = DateTimeUtil.getWeekOfMonth(now);
-
-        SubProgressOverviewResponse subProgressOverview = SubProgressOverviewResponse.builder()
-            .startDate(monday)
-            .endDate(sunday)
-            .weekOfMonth(weekOfMonth)
-            .subProgress(detailSubProgress)
-            .build();
-
         return MainGoalDetailsResponse.builder()
             .mainGoal(simpleMainGoalWithStatus)
             .subGoals(subGoalPreview)
-            .progress(subProgressOverview)
+            .progress(
+                subProgressService.getProgress(subGoals, LocalDate.now(clock), Direction.CURRENT))
             .build();
-    }
-
-    public int calculateRate(List<SubProgressCalDto> subProgressCalDto) {
-
-        if(subProgressCalDto.isEmpty()) return 0;
-
-        int sum = 0;
-        for (SubProgressCalDto sp : subProgressCalDto) {
-            int rate = 0;
-            if (sp.getProgressCount() == 0) {
-                rate = 0;
-            } else if (sp.getProgressCount() >= sp.getTargetNum()) {
-                rate = 100;
-            } else {
-                rate = (int) ((double) sp.getProgressCount() / sp.getTargetNum() * 100);
-            }
-            sum += rate;
-        }
-        return sum / subProgressCalDto.size();
     }
 }

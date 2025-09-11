@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SubProgressQueryRepository {
 
-    List<SubProgressCalDto> aggregate(Long subGoalId, LocalDate start, LocalDate end);
+    List<SubProgressCalDto> aggregate(List<Long> subGoalIds, LocalDate start, LocalDate end);
 }
