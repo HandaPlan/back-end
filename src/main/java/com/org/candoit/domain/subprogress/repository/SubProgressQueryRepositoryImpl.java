@@ -18,21 +18,31 @@ public class SubProgressQueryRepositoryImpl implements SubProgressQueryRepositor
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<SubProgressCalDto> aggregate(Long subGoalId, LocalDate start, LocalDate end) {
+    public List<SubProgressCalDto> aggregate(List<Long> subGoalIds, LocalDate start,
+        LocalDate end) {
+
+        if (subGoalIds.isEmpty()) {
+            return List.of();
+        }
+
         List<SubProgressCalDto> subProgressCalDto = jpaQueryFactory.select(
                 Projections.constructor(
                     SubProgressCalDto.class,
+                    dailyAction.subGoal.subGoalId,
                     dailyAction.dailyActionId,
                     dailyAction.targetNum,
-                    dailyProgress.dailyProgressId.count().intValue()
+                    dailyProgress.checkedDate.countDistinct()
                 )
             )
             .from(dailyAction)
             .leftJoin(dailyProgress)
-            .on(dailyProgress.dailyAction.eq(dailyAction)
-                .and(dailyProgress.checkedDate.between(start, end)))
-            .where(dailyAction.subGoal.subGoalId.eq(subGoalId))
-            .groupBy(dailyAction.dailyActionId)
+            .on(dailyProgress.dailyAction.eq(dailyAction),
+                dailyProgress.checkedDate.between(start, end))
+            .where(
+                dailyAction.subGoal.subGoalId.in(subGoalIds)
+            )
+            .groupBy(dailyAction.subGoal.subGoalId, dailyAction.dailyActionId,
+                dailyAction.targetNum)
             .fetch();
 
         return subProgressCalDto;
