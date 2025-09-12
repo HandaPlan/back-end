@@ -2,7 +2,9 @@ package com.org.candoit.domain.subprogress.repository;
 
 import static com.org.candoit.domain.dailyaction.entity.QDailyAction.dailyAction;
 import static com.org.candoit.domain.dailyprogress.entity.QDailyProgress.dailyProgress;
+import static com.org.candoit.domain.subgoal.entity.QSubGoal.subGoal;
 
+import com.org.candoit.domain.subprogress.dto.DateSlotRow;
 import com.org.candoit.domain.subprogress.dto.SubProgressCalDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -46,5 +48,26 @@ public class SubProgressQueryRepositoryImpl implements SubProgressQueryRepositor
             .fetch();
 
         return subProgressCalDto;
+    }
+
+    @Override
+    public List<DateSlotRow> getCheckedSubProgressByDate(List<Long> subGoalIds,
+        LocalDate start, LocalDate end) {
+        return jpaQueryFactory.select(
+            Projections.constructor(
+                DateSlotRow.class,
+                dailyProgress.checkedDate,
+                subGoal.slotNum
+            ))
+            .from(dailyProgress)
+            .join(dailyProgress.dailyAction, dailyAction)
+            .join(dailyAction.subGoal, subGoal)
+            .where(
+                subGoal.subGoalId.in(subGoalIds),
+                dailyProgress.checkedDate.between(start, end)
+            )
+            .distinct()
+            .orderBy(dailyProgress.checkedDate.asc(), subGoal.slotNum.asc())
+            .fetch();
     }
 }
