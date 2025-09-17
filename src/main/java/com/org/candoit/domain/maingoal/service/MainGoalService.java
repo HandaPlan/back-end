@@ -22,7 +22,6 @@ import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subprogress.dto.Direction;
-import com.org.candoit.domain.subprogress.repository.SubProgressQueryRepository;
 import com.org.candoit.domain.subprogress.service.SubProgressService;
 import com.org.candoit.global.response.CustomException;
 import java.time.Clock;
@@ -45,7 +44,6 @@ public class MainGoalService {
     private final SubGoalRepository subGoalRepository;
     private final DailyActionRepository dailyActionRepository;
     private final SubGoalCustomRepository subGoalCustomRepository;
-    private final SubProgressQueryRepository subProgressQueryRepository;
     private final SubProgressService subProgressService;
     private final Clock clock;
 
@@ -64,16 +62,17 @@ public class MainGoalService {
 
         if (!request.getSubGoals().isEmpty()) {
 
-            List<SubGoal> subGoals = IntStream.range(0, request.getSubGoals().size())
-                .mapToObj(i -> SubGoal.builder()
-                    .mainGoal(savedMainGoal)
-                    .subGoalName(request.getSubGoals().get(i).getName())
-                    .slotNum(i + 1)
-                    .isStore(Boolean.FALSE)
-                    .build())
-                .collect(Collectors.toList());
+            List<SubGoal> subGoals = request.getSubGoals().stream()
+                .map(s -> SubGoal.builder()
+                .mainGoal(savedMainGoal)
+                .subGoalName(s.getName())
+                .slotNum(s.getSlotNum())
+                .isStore(Boolean.FALSE)
+                .build()
+            ).toList();
 
-            savedSubGoals = subGoalRepository.saveAll(subGoals);
+            savedSubGoals = subGoalRepository.saveAll(subGoals).stream()
+                .toList();
 
             List<CreateSubGoalRequest> subGoalRequest = request.getSubGoals();
 

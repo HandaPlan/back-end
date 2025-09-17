@@ -12,6 +12,7 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.CreatedSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.DetailSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
@@ -45,22 +46,20 @@ public class SubGoalService {
     private final Clock clock;
     private final DailyProgressCustomRepository dailyProgressCustomRepository;
 
-    public SimpleSubGoalInfoResponse createSubGoal(Member loginMember, Long mainGoalId,
+    public CreatedSubGoalResponse createSubGoal(Member loginMember, Long mainGoalId,
         CreateSubGoalRequest createSubGoalRequest) {
 
         MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
             loginMember.getMemberId()).orElseThrow(() -> new CustomException(
             MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
 
-        int alreadySavedSubGoalSize = subGoalCustomRepository.findByMainGoalId(
-            mainGoal.getMainGoalId()).size();
-
         SubGoal subGoal = SubGoal.builder()
             .mainGoal(mainGoal)
             .subGoalName(createSubGoalRequest.getName())
             .isStore(Boolean.FALSE)
-            .slotNum(alreadySavedSubGoalSize + 1)
+            .slotNum(createSubGoalRequest.getSlotNum())
             .build();
+
         SubGoal savedSubGoal = subGoalRepository.save(subGoal);
 
         if (!createSubGoalRequest.getDailyActions().isEmpty()) {
@@ -78,8 +77,8 @@ public class SubGoalService {
             dailyActionRepository.saveAll(dailyActions);
         }
 
-        return new SimpleSubGoalInfoResponse(savedSubGoal.getSubGoalId(),
-            savedSubGoal.getSubGoalName());
+        return new CreatedSubGoalResponse(savedSubGoal.getSubGoalId(),
+            savedSubGoal.getSubGoalName(), savedSubGoal.getSlotNum());
     }
 
     public SimpleInfoWithAttainmentResponse updateSubGoal(Member loginMember, Long subGoalId,
