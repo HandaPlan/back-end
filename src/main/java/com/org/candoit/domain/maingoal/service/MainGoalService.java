@@ -141,8 +141,8 @@ public class MainGoalService {
             .orElseThrow(() -> new CustomException(
                 MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
 
-        mainGoal.updateMainGoal(updateMainGoalRequest.getMainGoalName(),
-            updateMainGoalRequest.getMainGoalStatus());
+        mainGoal.updateMainGoal(updateMainGoalRequest.getName(),
+            updateMainGoalRequest.getStatus());
 
         return new SimpleMainGoalWithStatusResponse(mainGoal.getMainGoalId(),
             mainGoal.getMainGoalName(), mainGoal.getMainGoalStatus());

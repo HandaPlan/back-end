@@ -10,6 +10,6 @@ import lombok.Getter;
 public class UpdateMainGoalRequest {
 
     @NotBlank
-    private String mainGoalName;
-    private MainGoalStatus mainGoalStatus;
+    private String name;
+    private MainGoalStatus status;
 }
