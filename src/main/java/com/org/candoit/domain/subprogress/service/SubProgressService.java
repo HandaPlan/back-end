@@ -132,8 +132,8 @@ public class SubProgressService {
             end = date.with(TemporalAdjusters.lastDayOfMonth());
         } else if (unit == DateUnit.WEEK) {
             switch (direction) {
-                case PREV -> date = date.minusMonths(1);
-                case NEXT -> date = date.plusMonths(1);
+                case PREV -> date = date.minusWeeks(1);
+                case NEXT -> date = date.plusWeeks(1);
             }
             start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             end = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));

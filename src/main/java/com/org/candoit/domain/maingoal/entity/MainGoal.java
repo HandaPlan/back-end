@@ -42,10 +42,6 @@ public class MainGoal extends BaseTimeEntity {
     @Builder.Default
     private MainGoalStatus mainGoalStatus = MainGoalStatus.ACTIVITY;
 
-    private Integer lastAchievementRate;
-
-    private Integer thisAchievementRate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
