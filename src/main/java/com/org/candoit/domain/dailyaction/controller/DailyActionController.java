@@ -2,6 +2,7 @@ package com.org.candoit.domain.dailyaction.controller;
 
 import com.org.candoit.domain.dailyaction.dto.CreateDailyActionRequest;
 import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
+import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.dto.UpdateDailyActionRequest;
 import com.org.candoit.domain.dailyaction.service.DailyActionService;
 import com.org.candoit.domain.member.entity.Member;
@@ -28,12 +29,12 @@ public class DailyActionController {
     private final DailyActionService dailyActionService;
 
     @PostMapping("/sub-goals/{subGoalId}/daily-actions")
-    public ResponseEntity<ApiResponse<DailyActionInfoWithAttainmentResponse>> createDailyAction(
+    public ResponseEntity<ApiResponse<SimpleDailyActionInfoResponse>> createDailyAction(
         @Parameter(hidden = true) @LoginMember Member loginMember,
         @PathVariable Long subGoalId,
         @Valid @RequestBody CreateDailyActionRequest dailyActionRequest) {
 
-        DailyActionInfoWithAttainmentResponse result = dailyActionService.createDailyAction(loginMember, subGoalId, dailyActionRequest);
+        SimpleDailyActionInfoResponse result = dailyActionService.createDailyAction(loginMember, subGoalId, dailyActionRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

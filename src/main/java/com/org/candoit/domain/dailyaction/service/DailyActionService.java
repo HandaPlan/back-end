@@ -2,6 +2,7 @@ package com.org.candoit.domain.dailyaction.service;
 
 import com.org.candoit.domain.dailyaction.dto.CreateDailyActionRequest;
 import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
+import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.dto.UpdateDailyActionRequest;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.dailyaction.exception.DailyActionErrorCode;
@@ -25,7 +26,7 @@ public class DailyActionService {
     private final DailyActionCustomRepository dailyActionCustomRepository;
     private final SubGoalCustomRepository subGoalCustomRepository;
 
-    public DailyActionInfoWithAttainmentResponse createDailyAction(Member loginMember,
+    public SimpleDailyActionInfoResponse createDailyAction(Member loginMember,
         Long subGoalId, CreateDailyActionRequest dailyActionRequest) {
 
         SubGoal subGoal = subGoalCustomRepository.findByMemberIdAndSubGoalId(
@@ -40,12 +41,11 @@ public class DailyActionService {
 
 
         DailyAction savedDailyAction = dailyActionRepository.save(dailyAction);
-        return DailyActionInfoWithAttainmentResponse.builder()
+        return SimpleDailyActionInfoResponse.builder()
             .id(savedDailyAction.getDailyActionId())
             .title(savedDailyAction.getDailyActionTitle())
             .content(savedDailyAction.getContent())
             .targetNum(savedDailyAction.getTargetNum())
-            .attainment(savedDailyAction.getIsStore())
             .build();
     }
 
