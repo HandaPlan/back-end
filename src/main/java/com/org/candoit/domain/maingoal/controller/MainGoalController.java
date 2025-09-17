@@ -3,7 +3,6 @@ package com.org.candoit.domain.maingoal.controller;
 import com.org.candoit.domain.maingoal.dto.CreateMainGoalRequest;
 import com.org.candoit.domain.maingoal.dto.MainGoalDetailsResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalListResponse;
-import com.org.candoit.domain.maingoal.dto.MainGoalResponse;
 import com.org.candoit.domain.maingoal.dto.SimpleMainGoalInfoResponse;
 import com.org.candoit.domain.maingoal.dto.SimpleMainGoalWithStatusResponse;
 import com.org.candoit.domain.maingoal.dto.UpdateMainGoalRequest;

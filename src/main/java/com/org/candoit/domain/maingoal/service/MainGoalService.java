@@ -17,23 +17,16 @@ import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.maingoal.repository.MainGoalRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
-import com.org.candoit.domain.subgoal.dto.DetailSubProgressResponse;
 import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
-import com.org.candoit.domain.subgoal.dto.SubGoalResponse;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subprogress.dto.Direction;
-import com.org.candoit.domain.subprogress.dto.SubProgressCalDto;
-import com.org.candoit.domain.subprogress.dto.SubProgressOverviewResponse;
 import com.org.candoit.domain.subprogress.repository.SubProgressQueryRepository;
 import com.org.candoit.domain.subprogress.service.SubProgressService;
 import com.org.candoit.global.response.CustomException;
-import com.org.candoit.global.util.DateTimeUtil;
 import java.time.Clock;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -154,17 +147,6 @@ public class MainGoalService {
 
         return new SimpleMainGoalWithStatusResponse(mainGoal.getMainGoalId(),
             mainGoal.getMainGoalName(), mainGoal.getMainGoalStatus());
-    }
-
-    private List<SubGoalResponse> createSubGoalResponse(List<SubGoal> subGoalList) {
-        return subGoalList.stream()
-            .map(subGoal -> SubGoalResponse.builder()
-                .subGoalId(subGoal.getSubGoalId())
-                .subGoalName(subGoal.getSubGoalName())
-                .slotNum(subGoal.getSlotNum())
-                .attainment(subGoal.getIsStore())
-                .build())
-            .collect(Collectors.toList());
     }
 
     public MainGoalListResponse getPreviewList(Member member, MainGoalStatus state) {
