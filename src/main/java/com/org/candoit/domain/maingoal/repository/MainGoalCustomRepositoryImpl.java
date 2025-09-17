@@ -53,8 +53,20 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .fetch();
     }
 
+    @Override
+    public Optional<MainGoal> findOldestByMemberId(Long memberId) {
+        return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
+            .from(mainGoal)
+            .where(mainGoal.member.memberId.eq(memberId)
+                .and(mainGoal.mainGoalStatus.eq(MainGoalStatus.ACTIVITY)))
+            .orderBy(mainGoal.mainGoalId.asc())
+            .fetchFirst());
+    }
+
     private BooleanExpression checkStatus(MainGoalStatus status) {
-        if(status == null) return null;
+        if (status == null) {
+            return null;
+        }
         return mainGoal.mainGoalStatus.eq(status);
     }
 }

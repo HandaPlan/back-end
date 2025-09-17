@@ -11,4 +11,5 @@ public interface MainGoalCustomRepository {
     Optional<MainGoal> findRepresentativeMainGoalByMemberId(Long memberId);
     List<MainGoal> findByMemberIdAndStatus(Long memberId, MainGoalStatus status);
     List<MainGoal> findByMemberId(Long memberId);
+    Optional<MainGoal> findOldestByMemberId(Long memberId);
 }
