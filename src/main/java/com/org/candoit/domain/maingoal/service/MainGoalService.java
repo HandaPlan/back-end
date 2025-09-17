@@ -62,8 +62,6 @@ public class MainGoalService {
             .member(member)
             .mainGoalName(request.getName())
             .mainGoalStatus(MainGoalStatus.ACTIVITY)
-            .thisAchievementRate(0)
-            .lastAchievementRate(0)
             .isRepresentative(Boolean.FALSE)
             .build();
 
