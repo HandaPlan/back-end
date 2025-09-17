@@ -1,7 +1,6 @@
 package com.org.candoit.domain.subgoal.service;
 
 import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
-import com.org.candoit.domain.dailyaction.dto.SimpleDailyActionInfoResponse;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
 import com.org.candoit.domain.dailyaction.repository.DailyActionCustomRepository;
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
@@ -15,13 +14,13 @@ import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
 import com.org.candoit.domain.subgoal.dto.CreatedSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.DetailSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
-import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
 import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
 import com.org.candoit.domain.subgoal.dto.UpdateSubGoalRequest;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
+import com.org.candoit.domain.subprogress.dto.DateUnit;
 import com.org.candoit.global.response.CustomException;
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -102,7 +101,7 @@ public class SubGoalService {
     }
 
     public DetailSubGoalResponse getDetailSubGoal(Member loginMember, Long subGoalId,
-        String period) {
+        DateUnit unit) {
         SubGoal subGoal = subGoalCustomRepository.findByMemberIdAndSubGoalId(
                 loginMember.getMemberId(), subGoalId)
             .orElseThrow(() -> new CustomException(SubGoalErrorCode.NOT_FOUND_SUB_GOAL));
@@ -121,10 +120,10 @@ public class SubGoalService {
         LocalDate startDay = LocalDate.now(clock);
         LocalDate endDay = LocalDate.now(clock);
 
-        if ("week".equals(period)) {
+        if (DateUnit.WEEK.equals(unit)) {
             startDay = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             endDay = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        } else if ("month".equals(period)) {
+        } else if (DateUnit.MONTH.equals(unit)) {
             startDay = now.with(TemporalAdjusters.firstDayOfMonth());
             endDay = now.with(TemporalAdjusters.lastDayOfMonth());
         }
