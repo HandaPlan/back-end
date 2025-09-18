@@ -114,23 +114,22 @@ public class MainGoalService {
 
     public Boolean updateMainGoalRep(Member loginMember, Long mainGoalId) {
 
-        checkedAlreadyRep(loginMember.getMemberId());
-        MainGoal mainGoal = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId,
-                loginMember.getMemberId())
-            .orElseThrow(() -> new CustomException(
-                MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
-        mainGoal.checkRepresentation();
+        // 바꾸려는 메인골
+        MainGoal target = mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, loginMember.getMemberId())
+            .orElseThrow(() -> new CustomException(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
 
-        return Boolean.TRUE;
-    }
+        // 현재 대표 메인골
+        MainGoal currentRep = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(loginMember.getMemberId()).orElse(null);
 
-    private void checkedAlreadyRep(Long memberId) {
-        MainGoal mainGoal = mainGoalCustomRepository.findRepresentativeMainGoalByMemberId(memberId)
-            .orElse(null);
-
-        if (mainGoal != null) {
-            uncheckRepresentative(mainGoal);
+        if (Boolean.TRUE.equals(target.getIsRepresentative())) {
+            target.uncheckRepresentation();
+        } else {
+            if (currentRep != null && !currentRep.getMainGoalId().equals(target.getMainGoalId())) {
+                currentRep.uncheckRepresentation();
+            }
+            target.checkRepresentation();
         }
+        return Boolean.TRUE;
     }
 
     private void uncheckRepresentative(MainGoal mainGoal) {
