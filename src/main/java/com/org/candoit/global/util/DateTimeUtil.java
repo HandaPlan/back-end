@@ -7,9 +7,8 @@ public class DateTimeUtil {
     public static int getWeekOfMonth(LocalDate date){
         LocalDate firstDayOfMonth = date.withDayOfMonth(1);
         int dayOfWeekOfFirst = firstDayOfMonth.getDayOfWeek().getValue();
+        int dayOfMonth = date.getDayOfMonth();
 
-        int day = date.getDayOfWeek().getValue();
-
-        return (day + dayOfWeekOfFirst - 2) / 7 + 1;
+        return (dayOfMonth + dayOfWeekOfFirst - 2) / 7 + 1;
     }
 }
