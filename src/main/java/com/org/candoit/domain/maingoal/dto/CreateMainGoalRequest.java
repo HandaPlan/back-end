@@ -1,6 +1,6 @@
 package com.org.candoit.domain.maingoal.dto;
 
-import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.CreateSubGoalForMainGoalRequest;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.Getter;
@@ -12,5 +12,5 @@ public class CreateMainGoalRequest {
 
     @NotBlank
     private String name;
-    private List<CreateSubGoalRequest> subGoals;
+    private List<CreateSubGoalForMainGoalRequest> subGoals;
 }

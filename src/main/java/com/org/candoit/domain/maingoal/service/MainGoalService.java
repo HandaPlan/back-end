@@ -16,6 +16,7 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.maingoal.repository.MainGoalRepository;
 import com.org.candoit.domain.member.entity.Member;
+import com.org.candoit.domain.subgoal.dto.CreateSubGoalForMainGoalRequest;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
 import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
@@ -27,7 +28,9 @@ import com.org.candoit.global.response.CustomException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -58,31 +61,31 @@ public class MainGoalService {
 
         MainGoal savedMainGoal = mainGoalRepository.save(mainGoal);
 
-        List<SubGoal> savedSubGoals;
+        List<CreateSubGoalForMainGoalRequest> requestSubGoals =
+            Optional.ofNullable(request.getSubGoals()).orElseGet(Collections::emptyList);
 
-        if (!request.getSubGoals().isEmpty()) {
+        if (!requestSubGoals.isEmpty()) {
 
-            List<SubGoal> subGoals = request.getSubGoals().stream()
-                .map(s -> SubGoal.builder()
-                .mainGoal(savedMainGoal)
-                .subGoalName(s.getName())
-                .slotNum(s.getSlotNum())
-                .isStore(Boolean.FALSE)
-                .build()
-            ).toList();
+            List<SubGoal> subGoals = IntStream.range(0, request.getSubGoals().size())
+                .mapToObj(i -> SubGoal.builder()
+                    .mainGoal(savedMainGoal)
+                    .subGoalName(request.getSubGoals().get(i).getName())
+                    .slotNum(i + 1)
+                    .isStore(Boolean.FALSE)
+                    .build())
+                .collect(Collectors.toList());
 
-            savedSubGoals = subGoalRepository.saveAll(subGoals).stream()
-                .toList();
+            List<SubGoal> savedSubGoals = subGoalRepository.saveAll(subGoals);
 
-            List<CreateSubGoalRequest> subGoalRequest = request.getSubGoals();
-
-            List<DailyAction> dailyActions = IntStream.range(0, subGoalRequest.size())
+            List<DailyAction> dailyActions = IntStream.range(0, requestSubGoals.size())
                 .boxed()
                 .flatMap(i -> {
                     SubGoal nowSavedSubGoal = savedSubGoals.get(i);
-                    List<CreateDailyActionRequest> dailyActionRequests = subGoalRequest.get(i)
-                        .getDailyActions();
-                    return dailyActionRequests.stream()
+                    List<CreateDailyActionRequest> requestDailyActions =
+                        Optional.ofNullable(requestSubGoals.get(i)
+                            .getDailyActions()).orElseGet(Collections::emptyList);
+
+                    return requestDailyActions.stream()
                         .map(req -> DailyAction.builder()
                             .dailyActionTitle(req.getTitle())
                             .content(req.getContent())
