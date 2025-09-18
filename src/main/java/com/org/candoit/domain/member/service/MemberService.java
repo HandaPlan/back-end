@@ -108,33 +108,33 @@ public class MemberService {
         }
     }
 
-    public MyPageResponse updateInfo(Long memberId, MemberUpdateRequest memberUpdateRequest){
+    public MyPageResponse updateInfo(Long memberId, MemberUpdateRequest memberUpdateRequest) {
 
-        Member updateMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(
-            MemberErrorCode.NOT_FOUND_MEMBER));
+        Member updateMember = memberRepository.findById(memberId)
+            .orElseThrow(() -> new CustomException(
+                MemberErrorCode.NOT_FOUND_MEMBER));
 
-        validateDuplicateOnUpdate(memberUpdateRequest.getEmail(), memberUpdateRequest.getNickname(), memberId);
+        if (memberUpdateRequest.getNickname() != null) {
+            validateDuplicateOnUpdate(memberUpdateRequest.getNickname(),
+                updateMember.getNickname());
+        }
 
-        updateMember.updateInfo(memberUpdateRequest.getEmail(), memberUpdateRequest.getNickname(),
+        updateMember.updateInfo(memberUpdateRequest.getNickname(),
             memberUpdateRequest.getComment(), memberUpdateRequest.getProfile_image());
 
         return MyPageResponse.builder()
-            .profileImage(memberUpdateRequest.getProfile_image())
-            .comment(memberUpdateRequest.getComment())
-            .email(memberUpdateRequest.getEmail())
-            .nickname(memberUpdateRequest.getNickname())
+            .profileImage(updateMember.getProfilePath())
+            .comment(updateMember.getComment())
+            .email(updateMember.getEmail())
+            .nickname(updateMember.getNickname())
             .build();
     }
 
-    private void validateDuplicateOnUpdate(String updateEmail, String updateNickname,
-        Long memberId) {
-        Member foundMemberByEmail = memberRepository.findByEmailAndMemberStatus(updateEmail, MemberStatus.ACTIVITY).orElse(null);
-        Member foundMemberByNickname = memberRepository.findByNicknameAndMemberStatus(updateNickname, MemberStatus.ACTIVITY).orElse(null);
+    private void validateDuplicateOnUpdate(String updateNickname, String originNickName) {
 
-        if(foundMemberByEmail != null && !foundMemberByEmail.getMemberId().equals(memberId)){
-            throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
-        }
-        else if(foundMemberByNickname != null && !foundMemberByNickname.getMemberId().equals(memberId)){
+        Member foundMemberByNickname = memberRepository.findByNicknameAndMemberStatus(
+            updateNickname, MemberStatus.ACTIVITY).orElse(null);
+        if (foundMemberByNickname != null && !originNickName.equals(updateNickname)) {
             throw new CustomException(MemberErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }

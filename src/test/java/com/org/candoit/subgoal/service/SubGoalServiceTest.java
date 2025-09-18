@@ -13,6 +13,7 @@ import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.CreatedSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
 import com.org.candoit.domain.subgoal.dto.UpdateSubGoalRequest;
@@ -73,16 +74,16 @@ class SubGoalServiceTest {
             loginMember.getMemberId())).thenReturn(
             Optional.of(mainGoal));
 
-        CreateSubGoalRequest request = new CreateSubGoalRequest("subGoal", List.of());
+        CreateSubGoalRequest request = new CreateSubGoalRequest("subGoal", 1, List.of());
         SubGoal create = SubGoal.builder()
             .subGoalName(request.getName())
-            .slotNum(alreadySavedSubGoals.size() + 1)
+            .slotNum(request.getSlotNum())
             .build();
 
         when(subGoalRepository.save(any(SubGoal.class))).thenReturn(create);
 
         // when
-        SimpleSubGoalInfoResponse result = subGoalService.createSubGoal(loginMember, mainGoal.getMainGoalId(), request);
+        CreatedSubGoalResponse result = subGoalService.createSubGoal(loginMember, mainGoal.getMainGoalId(), request);
 
         // then
         assertEquals(request.getName(), result.getName());
@@ -94,7 +95,7 @@ class SubGoalServiceTest {
         // given
         when(mainGoalCustomRepository.findByMainGoalIdAndMemberId(anyLong(), anyLong())).thenReturn(
             Optional.empty());
-        CreateSubGoalRequest request = new CreateSubGoalRequest("subGoal", List.of());
+        CreateSubGoalRequest request = new CreateSubGoalRequest("subGoal", 1, List.of());
 
         // when, then
         assertThatThrownBy(() -> subGoalService.createSubGoal(loginMember, 1l, request))

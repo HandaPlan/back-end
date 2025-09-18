@@ -47,12 +47,10 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private MemberRole memberRole;
 
-    public void updateInfo(String email, String nickname, String comment, String profilePath){
-
-        this.email = email;
-        this.nickname = nickname;
-        this.comment = comment;
-        this.profilePath = profilePath;
+    public void updateInfo(String nickname, String comment, String profilePath){
+        if(nickname != null && !nickname.isEmpty()) this.nickname = nickname;
+        if(comment != null) this.comment = comment;
+        if(profilePath != null && !profilePath.isEmpty()) this.profilePath = profilePath;
     }
 
     public void updatePassword(String password){

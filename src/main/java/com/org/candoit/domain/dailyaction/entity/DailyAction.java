@@ -47,9 +47,9 @@ public class DailyAction {
     private SubGoal subGoal;
 
     public void updateDailyAction(String title, String content, Integer targetNum, Boolean attainment) {
-        this.dailyActionTitle = title;
-        this.content = content;
-        this.targetNum = targetNum;
-        this.isStore = attainment;
+        if(title != null && !title.isEmpty()) this.dailyActionTitle = title;
+        if(content != null && !content.isEmpty()) this.content = content;
+        if(targetNum != null) this.targetNum = targetNum;
+        if(attainment != null) this.isStore = attainment;
     }
 }

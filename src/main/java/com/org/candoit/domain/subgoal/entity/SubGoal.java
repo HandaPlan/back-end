@@ -45,7 +45,7 @@ public class SubGoal extends BaseTimeEntity {
     private MainGoal mainGoal;
 
     public void changeSubGoalProperty(String name, Boolean attainment){
-        this.subGoalName = name;
-        this.isStore = attainment;
+        if(name != null && !name.isEmpty()) this.subGoalName = name;
+        if(attainment != null) this.isStore = attainment;
     }
 }

@@ -2,11 +2,12 @@ package com.org.candoit.domain.subgoal.controller;
 
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
+import com.org.candoit.domain.subgoal.dto.CreatedSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.DetailSubGoalResponse;
 import com.org.candoit.domain.subgoal.dto.SimpleInfoWithAttainmentResponse;
-import com.org.candoit.domain.subgoal.dto.SimpleSubGoalInfoResponse;
 import com.org.candoit.domain.subgoal.dto.UpdateSubGoalRequest;
 import com.org.candoit.domain.subgoal.service.SubGoalService;
+import com.org.candoit.domain.subprogress.dto.DateUnit;
 import com.org.candoit.global.annotation.LoginMember;
 import com.org.candoit.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,12 +32,12 @@ public class SubGoalController {
     private final SubGoalService subGoalService;
 
     @PostMapping("/main-goals/{mainGoalId}/sub-goals")
-    public ResponseEntity<ApiResponse<SimpleSubGoalInfoResponse>> createSubGoal(
+    public ResponseEntity<ApiResponse<CreatedSubGoalResponse>> createSubGoal(
         @Parameter(hidden = true) @LoginMember Member loginMember,
         @PathVariable Long mainGoalId,
         @Valid @RequestBody CreateSubGoalRequest createSubGoalRequest) {
 
-        SimpleSubGoalInfoResponse result = subGoalService.createSubGoal(loginMember, mainGoalId,
+        CreatedSubGoalResponse result = subGoalService.createSubGoal(loginMember, mainGoalId,
             createSubGoalRequest);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -65,10 +66,10 @@ public class SubGoalController {
     @GetMapping("/sub-goals/{subGoalId}")
     public ResponseEntity<ApiResponse<DetailSubGoalResponse>> getSubGoal(
         @Parameter(hidden = true) @LoginMember Member loginMember,
-        @PathVariable Long subGoalId, @RequestParam String period
+        @PathVariable Long subGoalId, @RequestParam DateUnit unit
     ) {
         DetailSubGoalResponse result = subGoalService.getDetailSubGoal(loginMember, subGoalId,
-            period);
+            unit);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

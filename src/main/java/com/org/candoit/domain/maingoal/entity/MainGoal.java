@@ -56,7 +56,7 @@ public class MainGoal extends BaseTimeEntity {
     }
 
     public void updateMainGoal(String mainGoalName, MainGoalStatus mainGoalStatus){
-        this.mainGoalName = mainGoalName;
-        this.mainGoalStatus = mainGoalStatus;
+        if(mainGoalName != null && !mainGoalName.isEmpty()) this.mainGoalName = mainGoalName;
+        if(mainGoalStatus != null) this.mainGoalStatus = mainGoalStatus;
     }
 }
