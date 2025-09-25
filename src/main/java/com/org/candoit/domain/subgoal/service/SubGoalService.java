@@ -6,6 +6,7 @@ import com.org.candoit.domain.dailyaction.repository.DailyActionCustomRepository
 import com.org.candoit.domain.dailyaction.repository.DailyActionRepository;
 import com.org.candoit.domain.dailyprogress.dto.DailyProgressResponse;
 import com.org.candoit.domain.dailyprogress.repository.DailyProgressCustomRepository;
+import com.org.candoit.domain.dailyprogress.service.DailyProgressService;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
@@ -21,6 +22,7 @@ import com.org.candoit.domain.subgoal.exception.SubGoalErrorCode;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
 import com.org.candoit.domain.subgoal.repository.SubGoalRepository;
 import com.org.candoit.domain.subprogress.dto.DateUnit;
+import com.org.candoit.domain.subprogress.dto.Direction;
 import com.org.candoit.global.response.CustomException;
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -38,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SubGoalService {
 
     private final SubGoalRepository subGoalRepository;
+    private final DailyProgressService dailyProgressService;
     private final SubGoalCustomRepository subGoalCustomRepository;
     private final MainGoalCustomRepository mainGoalCustomRepository;
     private final DailyActionRepository dailyActionRepository;
@@ -114,40 +117,12 @@ public class SubGoalService {
         List<DailyActionInfoWithAttainmentResponse> dailyActions = dailyActionCustomRepository.getSimpleDailyActionInfo(
             subGoalId);
 
-        DailyProgressResponse dailyProgressResponse;
-
-        LocalDate now = LocalDate.now(clock);
-        LocalDate startDay = LocalDate.now(clock);
-        LocalDate endDay = LocalDate.now(clock);
-
-        if (DateUnit.WEEK.equals(unit)) {
-            startDay = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            endDay = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        } else if (DateUnit.MONTH.equals(unit)) {
-            startDay = now.with(TemporalAdjusters.firstDayOfMonth());
-            endDay = now.with(TemporalAdjusters.lastDayOfMonth());
-        }
-
-        // 데일리 액션이 없는 경우
-        if (dailyActions.isEmpty()) {
-            dailyActions = List.of();
-            dailyProgressResponse = new DailyProgressResponse(startDay, endDay, List.of());
-        }
-        // 데일리 액션이 있는 경우
-        else{
-            List<LocalDate> checkedDate = dailyProgressCustomRepository.distinctCheckedDate(
-                subGoalId, startDay, endDay);
-
-            dailyProgressResponse = DailyProgressResponse.builder()
-                .startDate(startDay)
-                .endDate(endDay)
-                .dailyProgress(checkedDate)
-                .build();
-        }
         return DetailSubGoalResponse.builder()
             .subGoal(subGoalPreviewResponse)
             .dailyActions(dailyActions)
-            .progress(dailyProgressResponse)
+            .progress(
+                dailyProgressService.getCalendar(subGoalId, LocalDate.now(clock), Direction.CURRENT,
+                    unit, dailyActions))
             .build();
     }
 }
