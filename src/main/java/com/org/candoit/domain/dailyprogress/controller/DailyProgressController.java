@@ -51,7 +51,7 @@ public class DailyProgressController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-    @GetMapping("/sub-goals/{subGoalId}/daily-progress/checked")
+    @GetMapping("/sub-goals/{subGoalId}/daily-progress/calendar")
     public ResponseEntity<ApiResponse<DailyProgressResponse>> getDailyProgressCalendar(
         @Parameter(hidden = true) @LoginMember Member loginMember,
         @PathVariable Long subGoalId, @RequestParam LocalDate date,
