@@ -4,21 +4,17 @@ import static com.org.candoit.domain.dailyaction.entity.QDailyAction.dailyAction
 import static com.org.candoit.domain.dailyprogress.entity.QDailyProgress.dailyProgress;
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.subgoal.entity.QSubGoal.subGoal;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
 
 import com.org.candoit.domain.dailyaction.dto.DailyActionInfoWithAttainmentResponse;
 import com.org.candoit.domain.dailyaction.entity.DailyAction;
-import com.org.candoit.domain.dailyprogress.dto.DailyProgressRow;
 import com.org.candoit.domain.dailyprogress.dto.DetailProgressResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -74,6 +70,8 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
             .select(Projections.constructor(
                 DailyProgressRow.class,
                 dailyAction.dailyActionId,
+                dailyAction.dailyActionTitle,
+                dailyAction.content,
                 dailyProgress.checkedDate
             ))
             .from(dailyAction)
@@ -84,20 +82,38 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
             .orderBy(dailyAction.dailyActionId.asc(), dailyProgress.checkedDate.asc())
             .fetch();
 
-        Map<Long, List<LocalDate>> group = result.stream()
-            .collect(groupingBy(
-                DailyProgressRow::dailyActionId,
-                LinkedHashMap::new,
-                mapping(DailyProgressRow::checkedDate, toList())
-            ));
+        return groupByDailyAction(result);
+    }
 
-        return group.entrySet().stream()
-            .map(e -> {
-                List<LocalDate> dates = e.getValue().stream()
-                    .filter(Objects::nonNull)
-                    .toList();
-                return new DetailProgressResponse(e.getKey(), dates);
-            })
-            .toList();
+    private List<DetailProgressResponse> groupByDailyAction(
+        List<DailyProgressRow> result) {
+        Map<Long, DetailProgressResponse> map = new LinkedHashMap<>();
+
+        for (DailyProgressRow row : result) {
+            map.compute(row.dailyActionId(), (id, existing) -> {
+                if (existing == null) {
+                    List<LocalDate> dates = new ArrayList<>();
+                    if (row.checkedDate() != null)
+                        dates.add(row.checkedDate());
+
+                    return DetailProgressResponse.builder()
+                        .dailyActionId(row.dailyActionId())
+                        .title(row.title())
+                        .content(row.content())
+                        .checkedDate(dates)
+                        .build();
+                }
+                else{
+                    if(row.checkedDate() != null) existing.getCheckedDate().add(row.checkedDate());
+                    return existing;
+                }
+            });
+        }
+        return map.values().stream().toList();
+    }
+
+    public record DailyProgressRow(Long dailyActionId, String title, String content,
+                                           LocalDate checkedDate) {
+
     }
 }
