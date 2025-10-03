@@ -11,5 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DetailProgressResponse {
     private Long dailyActionId;
+    private String title;
+    private String content;
     private List<LocalDate> checkedDate;
 }

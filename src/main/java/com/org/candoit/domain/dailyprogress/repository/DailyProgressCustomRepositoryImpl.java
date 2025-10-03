@@ -3,19 +3,11 @@ package com.org.candoit.domain.dailyprogress.repository;
 import static com.org.candoit.domain.dailyaction.entity.QDailyAction.dailyAction;
 import static com.org.candoit.domain.dailyprogress.entity.QDailyProgress.dailyProgress;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
 
-import com.org.candoit.domain.dailyprogress.dto.DailyProgressRow;
-import com.org.candoit.domain.dailyprogress.dto.DetailProgressResponse;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
