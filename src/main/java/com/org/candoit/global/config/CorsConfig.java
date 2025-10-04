@@ -17,7 +17,7 @@ public class CorsConfig {
             "http://localhost:5173","http://localhost:8080",
             "https://handa-plan.vercel.app", "https://api.handa-plan.com"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "PUT"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600l);
