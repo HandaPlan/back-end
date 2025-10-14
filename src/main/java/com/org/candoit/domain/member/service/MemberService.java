@@ -1,5 +1,6 @@
 package com.org.candoit.domain.member.service;
 
+import com.org.candoit.domain.auth.exception.AuthErrorCode;
 import com.org.candoit.domain.member.dto.CheckPasswordRequest;
 import com.org.candoit.domain.member.dto.MemberCheckRequest;
 import com.org.candoit.domain.member.dto.MemberJoinRequest;
@@ -29,7 +30,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public void join(MemberJoinRequest memberJoinRequest){
+    public void join(MemberJoinRequest memberJoinRequest) {
 
         validateDuplicateOnJoin(memberJoinRequest.getEmail(), memberJoinRequest.getNickname());
 
@@ -45,33 +46,33 @@ public class MemberService {
         memberRepository.save(saveRequestMember);
     }
 
-    private void validateDuplicateOnJoin(String email, String nickname){
+    private void validateDuplicateOnJoin(String email, String nickname) {
 
-        if(memberRepository.existsByEmailAndMemberStatus(email, MemberStatus.ACTIVITY)){
+        if (memberRepository.existsByEmailAndMemberStatus(email, MemberStatus.ACTIVITY)) {
             throw new CustomException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
-        }
-        else if(memberRepository.existsByNicknameAndMemberStatus(nickname, MemberStatus.ACTIVITY)){
+        } else if (memberRepository.existsByNicknameAndMemberStatus(nickname,
+            MemberStatus.ACTIVITY)) {
             throw new CustomException(MemberErrorCode.NICKNAME_ALREADY_EXISTS);
         }
     }
 
-    public Boolean check(MemberCheckRequest memberCheckRequest){
+    public Boolean check(MemberCheckRequest memberCheckRequest) {
 
         String type = memberCheckRequest.getType();
         String content = memberCheckRequest.getContent();
 
-        if("nickname".equals(type)){
+        if ("nickname".equals(type)) {
             return memberRepository.existsByNicknameAndMemberStatus(content, MemberStatus.ACTIVITY);
-        }else if("email".equals(type)){
+        } else if ("email".equals(type)) {
             return memberRepository.existsByEmailAndMemberStatus(content, MemberStatus.ACTIVITY);
-        }else {
+        } else {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
     }
 
-    public MyPageResponse getMyPage(Long memberId){
+    public MyPageResponse getMyPage(Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new CustomException(
             MemberErrorCode.NOT_FOUND_MEMBER));
 
         return MyPageResponse.builder()
@@ -82,28 +83,30 @@ public class MemberService {
             .build();
     }
 
-    public void updatePassword(Long memberId, NewPasswordRequest newPasswordRequest){
+    public void updatePassword(Long memberId, NewPasswordRequest newPasswordRequest) {
         checkVerify(memberId, "new-password");
-        Member loginMember = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
+        Member loginMember = memberRepository.findById(memberId)
+            .orElseThrow(() -> new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
         loginMember.updatePassword(passwordEncoder.encode(newPasswordRequest.getNewPassword()));
     }
 
-    public void checkPassword(Member loginMember, CheckPasswordRequest checkPasswordRequest){
-        String prefix = "check-password:"+checkPasswordRequest.getType()+":";
-        if(passwordEncoder.matches(checkPasswordRequest.getPassword(), loginMember.getPassword())){
+    public void checkPassword(Member loginMember, CheckPasswordRequest checkPasswordRequest) {
+        String prefix = "check-password:" + checkPasswordRequest.getType() + ":";
+        if (passwordEncoder.matches(checkPasswordRequest.getPassword(),
+            loginMember.getPassword())) {
             redisTemplate.opsForValue().set(prefix + loginMember.getMemberId(),
-               "checked",
+                "checked",
                 Duration.ofMinutes(5));
-        }else{
+        } else {
             throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
         }
     }
 
-    private void checkVerify(Long memberId, String type){
-        String key = "check-password:"+type+":"+memberId;
-        if(redisTemplate.hasKey(key)){
+    private void checkVerify(Long memberId, String type) {
+        String key = "check-password:" + type + ":" + memberId;
+        if (redisTemplate.hasKey(key)) {
             redisTemplate.delete(key);
-        }else{
+        } else {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
     }
@@ -149,5 +152,37 @@ public class MemberService {
             throw new CustomException(MemberErrorCode.NOT_MATCHED_PASSWORD);
         }
         memberToWithdraw.withdraw();
+    }
+
+    public Boolean resetPassword(ResetPasswordRequest resetPasswordRequest) {
+
+        Member member = validateEmailAndEmailAuthentication(resetPasswordRequest.getEmail());
+        member.updatePassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+        deleteEmailAuthenticationData(resetPasswordRequest.getEmail());
+
+        return Boolean.TRUE;
+    }
+
+    private Member validateEmailAndEmailAuthentication(String email) {
+
+        Member member = memberRepository.findByEmailAndMemberStatus(email, MemberStatus.ACTIVITY)
+            .orElseThrow(() -> new CustomException(MemberErrorCode.NOT_FOUND_MEMBER));
+
+        String prefix = "auth:email:new-password:";
+
+        Boolean hasKeyInMemory = redisTemplate.hasKey(prefix + email);
+
+        if (Boolean.FALSE.equals(hasKeyInMemory)) {
+            throw new CustomException(AuthErrorCode.EMAIL_VERIFICATION_REQUIRED);
+        } else if (hasKeyInMemory == null) {
+            throw new CustomException(GlobalErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return member;
+    }
+
+    private void deleteEmailAuthenticationData(String email) {
+
+        redisTemplate.delete("auth:email:new-password:" + email);
     }
 }
