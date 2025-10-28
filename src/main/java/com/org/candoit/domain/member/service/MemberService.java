@@ -7,6 +7,7 @@ import com.org.candoit.domain.member.dto.MemberJoinRequest;
 import com.org.candoit.domain.member.dto.MemberUpdateRequest;
 import com.org.candoit.domain.member.dto.MyPageResponse;
 import com.org.candoit.domain.member.dto.NewPasswordRequest;
+import com.org.candoit.domain.member.dto.ResetPasswordRequest;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.member.entity.MemberRole;
 import com.org.candoit.domain.member.entity.MemberStatus;
@@ -16,6 +17,7 @@ import com.org.candoit.global.response.CustomException;
 import com.org.candoit.global.response.GlobalErrorCode;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String cloudFrontDomain;
 
     public void join(MemberJoinRequest memberJoinRequest) {
 
@@ -123,10 +127,10 @@ public class MemberService {
         }
 
         updateMember.updateInfo(memberUpdateRequest.getNickname(),
-            memberUpdateRequest.getComment(), memberUpdateRequest.getProfile_image());
+            memberUpdateRequest.getComment(), memberUpdateRequest.getProfileImage());
 
         return MyPageResponse.builder()
-            .profileImage(updateMember.getProfilePath())
+            .profileImage("https://" +cloudFrontDomain + updateMember.getProfilePath())
             .comment(updateMember.getComment())
             .email(updateMember.getEmail())
             .nickname(updateMember.getNickname())

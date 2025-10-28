@@ -1,4 +1,4 @@
-package com.org.candoit.domain.member.service;
+package com.org.candoit.domain.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
