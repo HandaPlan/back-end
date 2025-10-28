@@ -130,7 +130,7 @@ public class MemberService {
             memberUpdateRequest.getComment(), memberUpdateRequest.getProfileImage());
 
         return MyPageResponse.builder()
-            .profileImage("https://" +cloudFrontDomain + updateMember.getProfilePath())
+            .profileImage("https://" +cloudFrontDomain+ "/" + updateMember.getProfilePath())
             .comment(updateMember.getComment())
             .email(updateMember.getEmail())
             .nickname(updateMember.getNickname())
