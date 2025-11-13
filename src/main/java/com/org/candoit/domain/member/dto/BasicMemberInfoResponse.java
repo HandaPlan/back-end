@@ -5,10 +5,14 @@ import com.org.candoit.domain.member.entity.MemberStatus;
 import com.org.candoit.global.security.basic.CustomUserDetails;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
 @Setter
 @Getter
 public class BasicMemberInfoResponse {
+
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String cloudFrontDomain;
 
     private Long memberId;
 
@@ -30,7 +34,7 @@ public class BasicMemberInfoResponse {
         this.email = customUserDetails.getMember().getEmail();
         this.nickname = customUserDetails.getMember().getNickname();
         this.comment = customUserDetails.getMember().getComment();
-        this.profilePath = customUserDetails.getMember().getProfilePath();
+        this.profilePath = "https://" +cloudFrontDomain+ "/" + customUserDetails.getMember().getProfilePath();
         this.memberStatus = customUserDetails.getMember().getMemberStatus();
         this.memberRole = customUserDetails.getMember().getMemberRole();
     }
