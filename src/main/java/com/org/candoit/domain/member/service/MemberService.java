@@ -80,7 +80,7 @@ public class MemberService {
             MemberErrorCode.NOT_FOUND_MEMBER));
 
         return MyPageResponse.builder()
-            .profileImage(member.getProfilePath())
+            .profileImage("https://" +cloudFrontDomain+ "/" + member.getProfilePath())
             .comment(member.getComment())
             .email(member.getEmail())
             .nickname(member.getNickname())
