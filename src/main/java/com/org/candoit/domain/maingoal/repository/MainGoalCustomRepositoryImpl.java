@@ -3,8 +3,10 @@ package com.org.candoit.domain.maingoal.repository;
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.member.entity.QMember.member;
 
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalInfoResponse;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -31,7 +33,7 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
     public Optional<MainGoal> findActiveMainGoal(Long mainGoalId, Long memberId) {
         return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
             .from(mainGoal)
-            .where(mainGoal.mainGoalStatus.in(MainGoalStatus.ATTAINMENT, MainGoalStatus.PAUSE))
+            .where(mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT))
             .innerJoin(member)
             .on(mainGoal.member.memberId.eq(memberId))
             .where(mainGoal.mainGoalId.eq(mainGoalId)).fetchOne());
@@ -54,6 +56,17 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .from(mainGoal)
             .where((mainGoal.member.memberId.eq(memberId)).and(
                 checkStatus(status))).fetch();
+    }
+
+    @Override
+    public List<SimpleMainGoalInfoResponse> searchActiveMainGoals(Long memberId) {
+        return jpaQueryFactory.select(Projections.constructor(SimpleMainGoalInfoResponse.class,
+                mainGoal.mainGoalId, mainGoal.mainGoalName
+            ))
+            .from(mainGoal)
+            .where((mainGoal.member.memberId.eq(memberId)).and(
+                mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
+            .fetch();
     }
 
     @Override
@@ -82,7 +95,8 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .where(
                 mainGoal.member.memberId.eq(memberId)
                     .and(
-                    mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
+                        mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY,
+                            MainGoalStatus.ATTAINMENT)))
             .fetchFirst();
         return searchResult != null;
     }

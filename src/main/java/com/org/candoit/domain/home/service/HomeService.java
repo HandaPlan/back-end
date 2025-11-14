@@ -2,6 +2,7 @@ package com.org.candoit.domain.home.service;
 
 import com.org.candoit.domain.home.dto.HomeOverallResponse;
 import com.org.candoit.domain.maingoal.dto.MainGoalDataForHomeResponse;
+import com.org.candoit.domain.maingoal.dto.SimpleMainGoalInfoResponse;
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.exception.MainGoalErrorCode;
 import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
@@ -114,5 +115,9 @@ public class HomeService {
             count++;
         }
         return (int) Math.round(sum * 1.0 / count);
+    }
+
+    public List<SimpleMainGoalInfoResponse> getSimpleMainGoalList(Member member) {
+        return mainGoalCustomRepository.searchActiveMainGoals(member.getMemberId());
     }
 }

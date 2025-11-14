@@ -1,6 +1,5 @@
 package com.org.candoit.domain.subprogress.repository;
 
-import com.org.candoit.domain.subprogress.dto.CheckedSubProgressResponse;
 import com.org.candoit.domain.subprogress.dto.DateSlotRow;
 import com.org.candoit.domain.subprogress.dto.SubProgressCalDto;
 import java.time.LocalDate;

@@ -17,7 +17,6 @@ import com.org.candoit.domain.maingoal.repository.MainGoalCustomRepository;
 import com.org.candoit.domain.maingoal.repository.MainGoalRepository;
 import com.org.candoit.domain.member.entity.Member;
 import com.org.candoit.domain.subgoal.dto.CreateSubGoalForMainGoalRequest;
-import com.org.candoit.domain.subgoal.dto.CreateSubGoalRequest;
 import com.org.candoit.domain.subgoal.dto.SubGoalPreviewResponse;
 import com.org.candoit.domain.subgoal.entity.SubGoal;
 import com.org.candoit.domain.subgoal.repository.SubGoalCustomRepository;
@@ -130,10 +129,6 @@ public class MainGoalService {
             target.checkRepresentation();
         }
         return Boolean.TRUE;
-    }
-
-    private void uncheckRepresentative(MainGoal mainGoal) {
-        mainGoal.uncheckRepresentation();
     }
 
     public SimpleMainGoalWithStatusResponse updateMainGoal(Member loginMember, Long mainGoalId,
