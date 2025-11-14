@@ -2,6 +2,7 @@ package com.org.candoit.domain.maingoal.repository;
 
 import static com.org.candoit.domain.maingoal.entity.QMainGoal.mainGoal;
 import static com.org.candoit.domain.member.entity.QMember.member;
+
 import com.org.candoit.domain.maingoal.entity.MainGoal;
 import com.org.candoit.domain.maingoal.entity.MainGoalStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -21,6 +22,16 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
     public Optional<MainGoal> findByMainGoalIdAndMemberId(Long mainGoalId, Long memberId) {
         return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
             .from(mainGoal)
+            .innerJoin(member)
+            .on(mainGoal.member.memberId.eq(memberId))
+            .where(mainGoal.mainGoalId.eq(mainGoalId)).fetchOne());
+    }
+
+    @Override
+    public Optional<MainGoal> findActiveMainGoal(Long mainGoalId, Long memberId) {
+        return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
+            .from(mainGoal)
+            .where(mainGoal.mainGoalStatus.in(MainGoalStatus.ATTAINMENT, MainGoalStatus.PAUSE))
             .innerJoin(member)
             .on(mainGoal.member.memberId.eq(memberId))
             .where(mainGoal.mainGoalId.eq(mainGoalId)).fetchOne());
@@ -58,9 +69,22 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
         return Optional.ofNullable(jpaQueryFactory.select(mainGoal)
             .from(mainGoal)
             .where(mainGoal.member.memberId.eq(memberId)
-                .and(mainGoal.mainGoalStatus.eq(MainGoalStatus.ACTIVITY)))
+                .and(
+                    mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
             .orderBy(mainGoal.mainGoalId.asc())
             .fetchFirst());
+    }
+
+    @Override
+    public Boolean existsActiveMainGoal(Long memberId) {
+        Integer searchResult = jpaQueryFactory.selectOne()
+            .from(mainGoal)
+            .where(
+                mainGoal.member.memberId.eq(memberId)
+                    .and(
+                    mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
+            .fetchFirst();
+        return searchResult != null;
     }
 
     private BooleanExpression checkStatus(MainGoalStatus status) {
