@@ -20,15 +20,12 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class HomeService {
 
-    private static final Logger log = LoggerFactory.getLogger(HomeService.class);
     private final MainGoalCustomRepository mainGoalCustomRepository;
     private final SubGoalCustomRepository subGoalCustomRepository;
     private final Clock clock;
@@ -36,8 +33,15 @@ public class HomeService {
 
     public HomeOverallResponse getHomeOverall(Member member, Long mainGoalId) {
 
-        // 조회하려는 메인골 정하는 로직
         MainGoal mainGoal = getMainGoal(member.getMemberId(), mainGoalId);
+
+        if (mainGoal == null) {
+            return HomeOverallResponse.builder()
+                .mainGoal(null)
+                .subGoals(List.of())
+                .progress(List.of())
+                .build();
+        }
 
         LocalDate today = LocalDate.now(clock);
 
@@ -83,14 +87,18 @@ public class HomeService {
     private MainGoal getMainGoal(Long memberId, Long mainGoalId) {
 
         if (mainGoalId != null) {
-            return mainGoalCustomRepository.findByMainGoalIdAndMemberId(mainGoalId, memberId)
+            return mainGoalCustomRepository.findActiveMainGoal(mainGoalId, memberId)
                 .orElseThrow(() -> new CustomException(
                     MainGoalErrorCode.NOT_FOUND_MAIN_GOAL));
         }
-        return mainGoalCustomRepository
-            .findRepresentativeMainGoalByMemberId(memberId)
-            .orElseGet(() -> mainGoalCustomRepository.findOldestByMemberId(memberId)
-                .orElseThrow(() -> new CustomException(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL)));
+
+        if (mainGoalCustomRepository.existsActiveMainGoal(memberId)) {
+            return mainGoalCustomRepository
+                .findRepresentativeMainGoalByMemberId(memberId)
+                .orElseGet(() -> mainGoalCustomRepository.findOldestByMemberId(memberId)
+                    .orElseThrow(() -> new CustomException(MainGoalErrorCode.NOT_FOUND_MAIN_GOAL)));
+        }
+        return null;
     }
 
     private int getRateForMainGoal(List<DetailSubProgressResponse> checkState) {
