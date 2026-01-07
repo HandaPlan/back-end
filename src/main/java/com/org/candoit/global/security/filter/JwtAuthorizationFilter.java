@@ -28,7 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final Set<String> excludeAllPaths = Set.of(
         "/swagger-ui/**", "/v3/api-docs/**",
-        "/api/auth/login", "/api/members/join", "/api/auth/reissue",
+        "/api/auth/login", "/api/members/join",
         "/api/members/check", "/api/auth/send-code", "/api/auth/verify-code",
         "/api/members/new-password"
     );
