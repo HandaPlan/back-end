@@ -65,7 +65,7 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             ))
             .from(mainGoal)
             .where((mainGoal.member.memberId.eq(memberId)).and(
-                mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
+                mainGoal.mainGoalStatus.eq(MainGoalStatus.ACTIVITY)))
             .fetch();
     }
 
@@ -83,7 +83,7 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .from(mainGoal)
             .where(mainGoal.member.memberId.eq(memberId)
                 .and(
-                    mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY, MainGoalStatus.ATTAINMENT)))
+                    mainGoal.mainGoalStatus.eq(MainGoalStatus.ACTIVITY)))
             .orderBy(mainGoal.mainGoalId.asc())
             .fetchFirst());
     }
@@ -95,8 +95,7 @@ public class MainGoalCustomRepositoryImpl implements MainGoalCustomRepository {
             .where(
                 mainGoal.member.memberId.eq(memberId)
                     .and(
-                        mainGoal.mainGoalStatus.in(MainGoalStatus.ACTIVITY,
-                            MainGoalStatus.ATTAINMENT)))
+                        mainGoal.mainGoalStatus.eq(MainGoalStatus.ACTIVITY)))
             .fetchFirst();
         return searchResult != null;
     }
