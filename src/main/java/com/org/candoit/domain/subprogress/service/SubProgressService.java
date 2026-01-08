@@ -74,7 +74,7 @@ public class SubProgressService {
                 List<SubProgressCalDto> list = grouping.getOrDefault(subGoal.getSubGoalId(),
                     List.of());
                 return new DetailSubProgressResponse(subGoal.getSubGoalName(), subGoal.getSlotNum(),
-                    calculateRate(list));
+                    calculateRate(list), subGoal.getIsStore());
             }).toList();
 
         int weekOfMonth = DateTimeUtil.getWeekOfMonth(date);
