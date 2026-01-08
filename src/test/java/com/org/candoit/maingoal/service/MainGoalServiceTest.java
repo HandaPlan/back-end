@@ -114,11 +114,11 @@ class MainGoalServiceTest {
         int expectedWeekOfMonth = DateTimeUtil.getWeekOfMonth(now);
 
         List<DetailSubProgressResponse> details = List.of(
-            new DetailSubProgressResponse("서브골 1", 1, 70),
-            new DetailSubProgressResponse("서브골 2", 2, 10),
-            new DetailSubProgressResponse("서브골 3", 3, 20),
-            new DetailSubProgressResponse("서브골 4", 4, 30),
-            new DetailSubProgressResponse("서브골 5", 5, 40)
+            new DetailSubProgressResponse("서브골 1", 1, 70, Boolean.FALSE),
+            new DetailSubProgressResponse("서브골 2", 2, 10, Boolean.FALSE),
+            new DetailSubProgressResponse("서브골 3", 3, 20, Boolean.FALSE),
+            new DetailSubProgressResponse("서브골 4", 4, 30, Boolean.FALSE),
+            new DetailSubProgressResponse("서브골 5", 5, 40, Boolean.FALSE)
         );
 
         SubProgressOverviewResponse subProgressOverviewResponse = SubProgressOverviewResponse.builder()
