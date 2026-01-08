@@ -30,7 +30,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         "/swagger-ui/**", "/v3/api-docs/**",
         "/api/auth/login", "/api/members/join",
         "/api/members/check", "/api/auth/send-code", "/api/auth/verify-code",
-        "/api/members/new-password"
+        "/api/members/new-password", "/api/auth/reissue"
     );
 
     public JwtAuthorizationFilter(JwtUtil jwtUtil) {
