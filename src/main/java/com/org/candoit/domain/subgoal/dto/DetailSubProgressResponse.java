@@ -10,4 +10,5 @@ public class DetailSubProgressResponse {
     private String subGoalName;
     private Integer slotNum;
     private Integer rate;
+    private Boolean attainment;
 }
