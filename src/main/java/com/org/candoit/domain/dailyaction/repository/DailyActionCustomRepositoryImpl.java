@@ -72,7 +72,8 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
                 dailyAction.dailyActionId,
                 dailyAction.dailyActionTitle,
                 dailyAction.content,
-                dailyProgress.checkedDate
+                dailyProgress.checkedDate,
+                dailyAction.targetNum
             ))
             .from(dailyAction)
             .leftJoin(dailyProgress)
@@ -101,6 +102,7 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
                         .title(row.title())
                         .content(row.content())
                         .checkedDate(dates)
+                        .targetNum(row.targetNum)
                         .build();
                 }
                 else{
@@ -113,7 +115,7 @@ public class DailyActionCustomRepositoryImpl implements DailyActionCustomReposit
     }
 
     public record DailyProgressRow(Long dailyActionId, String title, String content,
-                                           LocalDate checkedDate) {
+                                           LocalDate checkedDate, Integer targetNum) {
 
     }
 }

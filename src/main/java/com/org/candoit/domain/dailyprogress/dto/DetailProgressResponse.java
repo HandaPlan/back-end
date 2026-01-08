@@ -14,4 +14,5 @@ public class DetailProgressResponse {
     private String title;
     private String content;
     private List<LocalDate> checkedDate;
+    private Integer targetNum;
 }
