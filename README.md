@@ -1,6 +1,5 @@
 <div align = "center">
-<a href = "https://handa-plan.vercel.app/" target="_blank"><img width="2048" height="1546" alt="image" src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FMVluP%2FdJMcadm74Cv%2FAAAAAAAAAAAAAAAAAAAAABbs_8z3qIw-3fqPwJb6jDCyhLFeaylTek17Y7ePnaU2%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1769871599%26allow_ip%3D%26allow_referer%3D%26signature%3DCLvWeynZxrirWhLLT8bIj%252BL1qmE%253D" /></a>
-<em>(위 이미지를 클릭하면, 한다라트 사이트로 이동합니다.)</em>
+<img width="2048" height="1546" alt="image" src="https://github.com/user-attachments/assets/bda4376e-e258-4a51-b13b-c16d89e0db4b" />
 </div>
 
 ## 0. 한 줄 소개
