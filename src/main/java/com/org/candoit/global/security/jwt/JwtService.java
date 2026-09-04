@@ -8,7 +8,6 @@ import com.org.candoit.global.security.basic.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +20,8 @@ public class JwtService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
 
     public NewTokenResponse reissue(String accessToken, String refreshToken) {
-        log.info("accessToken: {} refreshToken: {}", accessToken, refreshToken);
         String extractAccessToken = jwtUtil.removePrefixFromAccessToken(accessToken);
 
         Claims claimsAccessToken = jwtUtil.extractClaimsOrThrow("accessToken", extractAccessToken);
@@ -38,7 +35,6 @@ public class JwtService {
         }
 
         if (jwtUtil.checkBlacklist(extractAccessToken)) {
-            logout(accessToken);
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
 
@@ -46,7 +42,7 @@ public class JwtService {
 
         String existingRefreshToken = refreshTokenRepository.findByMemberId(
             memberIdFromRefreshToken);
-        if (existingRefreshToken == null) {
+        if (existingRefreshToken == null || !existingRefreshToken.equals(refreshToken)) {
             throw new CustomException(AuthErrorCode.UNAUTHORIZED);
         }
 
@@ -58,7 +54,8 @@ public class JwtService {
         Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
             customUserDetails, null, customUserDetails.getAuthorities());
 
-        log.info("jwtService: 로그인한 사용자: {}", ((CustomUserDetails)newAuthentication.getPrincipal()).getMember().getNickname());
+        log.info("jwtService: 로그인한 사용자: {}",
+            ((CustomUserDetails) newAuthentication.getPrincipal()).getMember().getNickname());
         SecurityContextHolder.getContext().setAuthentication(newAuthentication);
 
         return new NewTokenResponse(newAccessToken, newRefreshToken);
